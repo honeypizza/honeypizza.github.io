@@ -1,0 +1,104 @@
+---
+import { CATEGORIES, postHref, type Post } from '../lib/posts';
+
+export interface Props {
+  /** 더 오래된 글 */
+  prev?: Post;
+  /** 더 최근 글 */
+  next?: Post;
+}
+
+const { prev, next } = Astro.props;
+const category = (prev ?? next)?.data.category;
+const label = category ? `이전 글과 다음 글 (${CATEGORIES[category].label})` : '이전 글과 다음 글';
+---
+
+{
+  (prev || next) && (
+    <nav class="post-nav" aria-label={label}>
+      {prev && (
+        <a class="prev" href={postHref(prev)} rel="prev">
+          <span class="dir">
+            <span aria-hidden="true">← </span>이전 글
+          </span>
+          <span class="title">{prev.data.title}</span>
+        </a>
+      )}
+      {next && (
+        <a class="next" href={postHref(next)} rel="next">
+          <span class="dir">
+            다음 글<span aria-hidden="true"> →</span>
+          </span>
+          <span class="title">{next.data.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  /* 위에 1px 선 하나 (아래는 footer 선이 닫는다). 좁은 화면에서는 위아래로 쌓고, 넓으면 좌우로 나눈다. */
+  .post-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-block: var(--space-5);
+    text-decoration: none;
+  }
+
+  .prev + .next {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .dir {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* 목록의 글 제목과 같은 모양 */
+  .title {
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    letter-spacing: 0;
+    text-wrap: pretty;
+  }
+
+  a:hover .title {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (min-width: 640px) {
+    .post-nav {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .prev {
+      grid-column: 1;
+      padding-right: var(--space-5);
+    }
+
+    .next {
+      grid-column: 2;
+      align-items: flex-end;
+      padding-left: var(--space-5);
+      text-align: right;
+    }
+
+    .prev + .next {
+      border-top: 0;
+      border-left: 1px solid var(--color-border);
+    }
+  }
+</style>

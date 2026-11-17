@@ -1,0 +1,55 @@
+---
+/**
+ * 사진 + 캡션. 캡션에 링크나 강조를 넣고 싶을 때 쓴다.
+ * (단순한 캡션은 Markdown만으로도 된다: ![설명](./photo.jpg "캡션"))
+ *
+ *   import photo from './photo.jpg';
+ *   <Figure src={photo} alt="사진 설명" caption="캡션" />
+ *   <Figure src={photo} alt="사진 설명">캡션에 **강조**나 [링크](https://…)도 가능</Figure>
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+export interface Props {
+  /** import한 이미지, 또는 public/ 기준 경로("/images/a.jpg")나 외부 URL */
+  src: ImageMetadata | string;
+  /** 사진을 볼 수 없는 사람을 위한 설명 (필수) */
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+const hasSlot = Astro.slots.has('default');
+
+// 글 폴더의 파일을 "./a.jpg" 문자열로 넣으면 배포 후 깨지므로 build에서 바로 알린다.
+if (typeof src === 'string' && /^\.\.?\//.test(src)) {
+  throw new Error('영상·사진 파일은 글 맨 위에서 import 한 뒤 src={이름}처럼 중괄호로 넣어 주세요. (' + src + ')');
+}
+
+// 본문 폭(--width-prose)까지만 쓰므로 srcset을 그 2배(1400w)까지만 만든다.
+const COLUMN_WIDTH = 700;
+---
+
+<figure class="figure">
+  {
+    typeof src === 'string' ? (
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+    ) : (
+      <Image src={src} alt={alt} width={Math.min(src.width, COLUMN_WIDTH)} />
+    )
+  }
+  {
+    (caption || hasSlot) && (
+      <figcaption>
+        {caption}
+        <slot />
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  figcaption > :global(p) {
+    display: inline;
+  }
+</style>

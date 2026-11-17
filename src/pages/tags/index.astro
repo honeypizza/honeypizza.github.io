@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { SITE } from '../../consts';
+import { getPosts, groupByTag, tagHref } from '../../lib/posts';
+
+const title = '태그';
+const lede = '주제별로 모아 본 글';
+const tags = groupByTag(await getPosts());
+---
+
+<BaseLayout title={title} description={`글에 붙은 태그 ${tags.length}개와 태그별 글 목록 — ${SITE.description}`}>
+  <div class="container narrow">
+    <header class="page-header">
+      <h1>{title}</h1>
+      <p>{lede}</p>
+    </header>
+
+    {
+      tags.length === 0 ? (
+        <p class="empty">아직 태그가 없습니다.</p>
+      ) : (
+        <>
+          <section class="group" aria-labelledby="all-tags">
+            <h2 class="label" id="all-tags">
+              모든 태그{' '}<span class="count">{tags.length}개</span>
+            </h2>
+            <ul class="tag-index">
+              {tags.map((tag) => (
+                <li>
+                  <a href={`#tag-${tag.slug}`}>#{tag.label}</a>{' '}
+                  <span class="count">
+                    {tag.posts.length}
+                    <span class="sr-only">편</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {tags.map((tag) => (
+            <section class="group" aria-labelledby={`tag-${tag.slug}`}>
+              <h2 class="label" id={`tag-${tag.slug}`}>
+                <a href={tagHref(tag.label)}>
+                  #{tag.label}{' '}<span class="sr-only">태그 페이지</span>
+                </a>{' '}
+                <span class="count">{tag.posts.length}편</span>
+              </h2>
+              <PostList posts={tag.posts} showCategory compact />
+            </section>
+          ))}
+        </>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .group + .group {
+    margin-top: var(--space-8);
+  }
+
+  /* 연도별 목록(PostArchive)의 연도 label과 같은 모양 */
+  .label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-3);
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-label);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .label a {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+
+  .label a:hover,
+  .label a:focus-visible {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .count {
+    font-size: var(--text-label);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 태그 이름 + 글 수를 한 줄로 이어 쓴다. 상자 없이 간격으로만 나눈다. */
+  .tag-index {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .tag-index li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.375rem;
+    min-width: 0;
+  }
+
+  .tag-index a {
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+
+  .tag-index a:hover,
+  .tag-index a:focus-visible {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .empty {
+    color: var(--color-text-muted);
+  }
+</style>

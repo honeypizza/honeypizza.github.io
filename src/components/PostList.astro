@@ -1,0 +1,113 @@
+---
+import CategoryLabel from './CategoryLabel.astro';
+import { formatDate, isoDate, postHref, type Post } from '../lib/posts';
+
+export interface Props {
+  posts: Post[];
+  /** dot: 2026.11.17 / short: 11.17 (연도별 목록 안에서) */
+  dateStyle?: 'dot' | 'short';
+  showCategory?: boolean;
+  /** true면 요약 없이 날짜와 제목만, 간격도 좁게 (태그 목록처럼 같은 글이 반복되는 곳) */
+  compact?: boolean;
+}
+
+const { posts, dateStyle = 'dot', showCategory = false, compact = false } = Astro.props;
+---
+
+<ul class:list={['post-list', { compact }]}>
+  {
+    posts.map((post) => (
+      <li class="post-item">
+        <h3 class="title">
+          <a href={postHref(post)}>{post.data.title}</a>
+        </h3>
+        {!compact && <p class="description">{post.data.description}</p>}
+        <p class="meta">
+          <time datetime={isoDate(post.data.date)}>{formatDate(post.data.date, dateStyle)}</time>
+          {showCategory && (
+            <>
+              {' '}<span aria-hidden="true">·</span>{' '}<CategoryLabel category={post.data.category} />
+            </>
+          )}
+          {post.data.draft && (
+            <>
+              {' '}<span aria-hidden="true">·</span>{' '}<span class="draft">초안</span>
+            </>
+          )}
+        </p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  /* 목록 위아래 선은 없다. 구분선은 목록을 감싸는 쪽(연도·섹션 label)이 맡는다. */
+  .post-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+    padding: 0;
+    list-style: none;
+  }
+
+  .post-list.compact {
+    gap: var(--space-4);
+  }
+
+  .post-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  /* 읽는 순서는 제목 → 요약 → 날짜, 보이는 순서는 날짜가 맨 위. */
+  .meta {
+    order: -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--space-2);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .title {
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .title a {
+    text-decoration: none;
+  }
+
+  /* 제목 link가 항목 전체를 덮는다. 항목 어디를 눌러도 글로 간다. */
+  .title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .title a:hover,
+  .title a:focus-visible {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .description {
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  .draft {
+    font-weight: var(--weight-medium);
+    color: var(--color-accent);
+  }
+</style>

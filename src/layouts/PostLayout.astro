@@ -1,0 +1,247 @@
+---
+import type { MarkdownHeading } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import CategoryLabel from '../components/CategoryLabel.astro';
+import PostNav from '../components/PostNav.astro';
+import Toc from '../components/Toc.astro';
+import CodeBlocks from '../components/post/CodeBlocks.astro';
+import { buildToc } from '../components/post/toc';
+import { CATEGORIES, formatDate, isoDate, readingMinutes, tagHref, type Post } from '../lib/posts';
+import '../styles/prose.css';
+import '../styles/content-blocks.css';
+
+export interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+  prev?: Post;
+  next?: Post;
+}
+
+const { post, headings, prev, next } = Astro.props;
+const { title, description, date, category, tags, toc, cover, coverAlt, draft } = post.data;
+
+const minutes = readingMinutes(post.body);
+// 목차는 H2(각주 제목 제외)가 2개 이상일 때만 보인다. 한 section짜리 목차는 군더더기다.
+const tocItems = toc ? buildToc(headings) : [];
+const showToc = tocItems.length >= 2;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={cover}
+  imageAlt={coverAlt}
+  current={category}
+  article={{ publishedTime: date, tags, section: CATEGORIES[category].label }}
+>
+  <article class="post">
+    {showToc && <Toc headings={headings} items={tocItems} variant="mobile" />}
+
+    <div class="container post-grid">
+      <header class="post-header">
+        <h1>{title}</h1>
+        <p class="lede">{description}</p>
+        <div class="meta">
+          <span class="meta-main">
+            <CategoryLabel category={category} link />
+            <span aria-hidden="true">·</span>
+            <time datetime={isoDate(date)}>{formatDate(date)}</time>
+            <span aria-hidden="true">·</span>
+            <span>{minutes}분 분량</span>
+            {draft && <span class="draft">초안 (배포되지 않음)</span>}
+          </span>
+          {
+            tags.length > 0 && (
+              <ul class="tags" aria-label="태그">
+                {tags.map((tag) => (
+                  <li>
+                    <a href={tagHref(tag)}>#{tag}</a>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
+      </header>
+
+      {
+        showToc && (
+          <div class="post-aside">
+            <Toc headings={headings} items={tocItems} variant="desktop" />
+          </div>
+        )
+      }
+
+      {
+        cover && (
+          <div class="post-cover">
+            <Image
+              src={cover}
+              alt={coverAlt ?? ''}
+              loading="eager"
+              fetchpriority="high"
+              sizes="(min-width: 760px) 700px, 100vw"
+            />
+          </div>
+        )
+      }
+
+      <div class="prose post-body">
+        <slot />
+      </div>
+
+      <div class="post-end">
+        <PostNav prev={prev} next={next} />
+      </div>
+    </div>
+
+    <CodeBlocks />
+  </article>
+</BaseLayout>
+
+<style>
+  /*
+   * 본문 column 하나를 화면 가운데에 둔다. 넓은 화면(≥1200px)에서는 3단 grid의 오른쪽 칸에 목차가 붙는다.
+   * 목차가 있든 없든 본문 column 위치는 같다.
+   */
+  .post-grid {
+    display: grid;
+    grid-template-columns: minmax(0, var(--width-prose));
+    grid-template-areas: 'header' 'cover' 'body' 'end';
+    justify-content: center;
+  }
+
+  .post-header {
+    grid-area: header;
+    padding-block: var(--section-gap) var(--space-8);
+    text-align: center;
+  }
+
+  h1 {
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .lede {
+    max-width: 36rem;
+    margin: var(--space-5) auto 0;
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+    text-wrap: balance;
+  }
+
+  .meta,
+  .meta-main,
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .meta {
+    margin-top: var(--space-5);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  .tags {
+    min-width: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* 태그 묶음 앞의 가운뎃점. 좁은 화면에서는 태그가 다음 줄로 내려가므로 뺀다. */
+  .tags::before {
+    content: '·';
+    content: '·' / '';
+  }
+
+  /* 분류·태그 링크는 손가락으로 누르기 쉽게 위아래로 조금 넓힌다. */
+  .meta :global(a) {
+    display: inline-block;
+    padding-block: 0.125rem;
+  }
+
+  .tags a {
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+
+  .tags a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .draft {
+    font-weight: var(--weight-semibold);
+    color: var(--color-text);
+  }
+
+  .post-cover {
+    grid-area: cover;
+    margin-bottom: var(--space-7);
+  }
+
+  .post-cover :global(img) {
+    width: 100%;
+    border-radius: var(--radius);
+  }
+
+  .post-body {
+    grid-area: body;
+    min-width: 0;
+  }
+
+  .post-end {
+    grid-area: end;
+    min-width: 0;
+  }
+
+  .post-aside {
+    display: none;
+  }
+
+  @media (max-width: 599.98px) {
+    .tags {
+      flex-basis: 100%;
+    }
+
+    .tags::before {
+      display: none;
+    }
+  }
+
+  /* 좁은 화면: 위에 붙는 목차 막대(높이 + 위아래 선)만큼 anchor 이동 위치를 내린다. JS가 없으면 막대가 붙지 않는다. */
+  @media (max-width: 1199.98px) {
+    :global(:root:has(.toc--mobile[data-js])) {
+      --sticky-offset: calc(var(--toc-bar-height) + 2px);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .post-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--width-prose)) minmax(0, 1fr);
+      grid-template-areas:
+        '. header .'
+        '. cover aside'
+        '. body aside'
+        '. end aside';
+      column-gap: var(--space-6);
+    }
+
+    .post-aside {
+      display: block;
+      grid-area: aside;
+    }
+
+    .post > :global(.toc--mobile) {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,291 @@
+/* 본문 안의 블록 요소: 사진·동영상, code block, 표, 각주.
+   Callout·Quote·Gallery·Video·YouTube 고유의 모양은 각 component(src/components/mdx/)에 있다. */
+
+/* ==========================================================================
+   블록 위아래 간격 — 문단 사이(24px)보다 넓게.
+   :where()로 우선순위를 낮춰 prose.css의 "heading 바로 뒤", "첫 요소" 규칙이 이기게 둔다.
+   ========================================================================== */
+
+.prose > :where(figure, p:has(> img:only-child), p:has(> a:only-child > img:only-child)) {
+  margin-block: var(--space-7);
+}
+
+.prose > :where(pre, .code-block, .table-wrap, .callout) {
+  margin-block: var(--space-6);
+}
+
+/* ==========================================================================
+   사진 · 동영상 — ![설명](./a.jpg "캡션"), <Figure>, <Gallery>, <Video>, <YouTube>
+   ========================================================================== */
+
+.prose img {
+  border-radius: var(--radius);
+}
+
+/* 사진 한 장(링크가 걸린 사진 포함)은 단 폭을 꽉 채운다.
+   세로로 긴 사진은 화면 높이를 넘지 않게 줄여 가운데에 둔다. */
+.prose :where(figure > img, figure > a > img, p > img:only-child, p > a:only-child > img:only-child) {
+  --photo-max-height: min(80svh, 50rem);
+  max-height: var(--photo-max-height);
+  margin-inline: auto;
+  object-fit: contain;
+}
+
+.prose :where(figure > a, p > a:only-child):has(> img:only-child) {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+/* attr()로 사진 비율을 읽을 수 있는 browser에서는 높이를 줄인 세로 사진도 상자가 사진 크기와 같아져
+   모서리와 캡션이 사진에 맞는다. 원본보다 크게 늘리지도 않는다. 나머지 browser는 위 규칙대로. */
+@supports (width: calc(attr(width type(<number>), 0) * 1px)) {
+  .prose :where(figure > img, figure > a > img, p > img:only-child, p > a:only-child > img:only-child):where([width][height]) {
+    width: min(
+      attr(width type(<number>)) * 1px,
+      var(--photo-max-height) * attr(width type(<number>)) / attr(height type(<number>))
+    );
+  }
+
+  .prose > figure:has(> img[width][height], > a > img[width][height]) {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  /* 캡션이 길어도 figure 폭(= 사진 폭)을 넓히지 않게 */
+  .prose > figure:has(> img[width][height], > a > img[width][height]) > figcaption {
+    contain: inline-size;
+  }
+}
+
+/* 어두운 화면에서 사진·영상이 눈부시지 않게 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) :is(.prose img, .prose video, .post-cover img) {
+    filter: brightness(0.9);
+  }
+}
+
+:root[data-theme='dark'] :is(.prose img, .prose video, .post-cover img) {
+  filter: brightness(0.9);
+}
+
+.prose :where(figure:not(.quote) > figcaption) {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--color-text-muted);
+  text-align: start;
+}
+
+/* ==========================================================================
+   Code block (Shiki) + 언어 표시·복사 버튼 (PostLayout의 script가 .code-block으로 감싼다)
+   ========================================================================== */
+
+.prose :is(pre, .code-block) {
+  --code-pad: clamp(var(--space-4), 4vw, var(--space-5));
+}
+
+/* 위쪽 여백은 언어 표시·복사 버튼 자리. script가 돌기 전부터 잡아 둬서 화면이 밀리지 않는다. */
+.prose pre {
+  padding: 2.5rem var(--code-pad) 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  tab-size: 2;
+  word-break: normal;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.prose pre code {
+  font-family: inherit;
+}
+
+/* Shiki가 내보낸 light/dark 두 theme 색 중 현재 theme에 맞는 것을 고른다. */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+}
+
+@supports (color: light-dark(#fff, #000)) {
+  .astro-code,
+  .astro-code span {
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+  }
+}
+
+/* 기울임·굵기는 두 theme(GitHub light/dark)이 같아서 light 값만 쓴다. */
+.astro-code span {
+  font-style: var(--shiki-light-font-style, inherit);
+  font-weight: var(--shiki-light-font-weight, inherit);
+  text-decoration: var(--shiki-light-text-decoration, inherit);
+}
+
+.code-block {
+  position: relative;
+}
+
+.code-block__lang,
+.code-block__copy {
+  position: absolute;
+  font-size: var(--text-label);
+  letter-spacing: var(--tracking-label);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.code-block__lang {
+  top: var(--space-3);
+  left: var(--code-pad);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 바탕을 code block과 같은 색으로 칠해, 버튼이 코드 첫 줄 위에 떠도 글자가 겹쳐 보이지 않게 한다. */
+.code-block__copy {
+  top: var(--space-2);
+  right: calc(var(--code-pad) - var(--space-2));
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.code-block__copy:hover {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-text) 7%, var(--color-surface));
+}
+
+/* 마우스가 있는 화면에서는 hover·focus 때만 보인다. Touch 화면에서는 늘 보인다. */
+@media (hover: hover) and (pointer: fine) {
+  .code-block__copy {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .code-block:hover .code-block__copy,
+  .code-block:focus-within .code-block__copy {
+    opacity: 1;
+  }
+
+  /* 언어 표시가 없으면 위쪽 자리를 비워 둘 필요가 없다. */
+  .code-block:not(:has(.code-block__lang)) pre {
+    padding-top: 1.25rem;
+  }
+}
+
+/* ==========================================================================
+   Table — 가로선만, 좁은 화면에서는 .table-wrap 안에서 가로 scroll
+   ========================================================================== */
+
+.table-wrap {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+/* 좁은 화면: scroll 영역을 화면 끝까지 넓혀, 넘친 열이 화면 가장자리에서 잘려 보이게(= 옆으로 밀 수 있다는 신호).
+   표 자체는 안쪽 여백만큼 들어가 본문 글줄과 맞는다. */
+@media (max-width: 759.98px) {
+  .prose > .table-wrap {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+
+  .prose > .table-wrap:focus-visible {
+    outline-offset: -2px;
+  }
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 열이 4개 이상인 표는 칸이 세 줄로 쪼개지지 않게 최소 폭(576px)을 두고, 그보다 좁으면 옆으로 scroll.
+   2~3열 표는 화면 폭에 맞춘다. */
+.table-wrap table:has(tr > :nth-child(4)) {
+  min-width: 36rem;
+}
+
+/* 정렬(|:--:|)은 Markdown이 inline style로 넣으므로 여기서는 기본값만 둔다. */
+.table-wrap :is(th, td) {
+  min-width: 5em;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table-wrap :is(th, td):first-child {
+  padding-left: 0;
+}
+
+.table-wrap :is(th, td):last-child {
+  padding-right: 0;
+}
+
+.table-wrap th {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  vertical-align: bottom;
+}
+
+.table-wrap thead th {
+  border-bottom-color: var(--color-border-strong);
+}
+
+/* ==========================================================================
+   Footnotes — GFM [^1] 문법
+   ========================================================================== */
+
+/* 본문 속 번호: 작게 (줄 간격은 prose.css의 sup 규칙이 지킨다) */
+.prose sup:has(> a[data-footnote-ref]) {
+  font-size: var(--text-xs);
+}
+
+.prose a[data-footnote-ref] {
+  padding-inline: 0.15em;
+  font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+.prose a[data-footnote-ref]:hover {
+  text-decoration: underline;
+}
+
+.prose .footnotes {
+  margin-top: var(--space-8);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--color-text-muted);
+}
+
+.prose .footnotes p {
+  display: inline;
+}
+
+/* ↩가 Windows에서 파란 emoji로 나오지 않게 글자 모양으로. 손가락으로 누르기 쉽게 폭을 조금 준다. */
+.prose .footnotes a[data-footnote-backref] {
+  display: inline-block;
+  min-width: 1.5rem;
+  margin-left: 0.25em;
+  font-variant-emoji: text;
+  text-align: center;
+  text-decoration: none;
+}

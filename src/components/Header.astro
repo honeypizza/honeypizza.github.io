@@ -1,0 +1,123 @@
+---
+import { NAV, SITE, type NavKey } from '../consts';
+import ThemeToggle from './ThemeToggle.astro';
+
+export interface Props {
+  current?: NavKey;
+}
+
+const { current } = Astro.props;
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+
+// 그 page에 있으면 'page', 글 page처럼 그 section 안에 있으면 'true'.
+const ariaCurrent = (key: NavKey, href: string) => {
+  if (path === href) return 'page';
+  return key === current ? 'true' : undefined;
+};
+---
+
+<header class="site-header">
+  <div class="container inner">
+    <a class="site-title" href="/">{SITE.title}</a>
+    <nav class="site-nav" aria-label="주 메뉴">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href} aria-current={ariaCurrent(item.key, item.href)}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  /* sticky가 아니다. 글 page에서는 PostLayout의 현재 section bar가 top: 0에 붙는다. */
+  .inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'title toggle'
+      'nav nav';
+    align-items: center;
+    row-gap: var(--space-1);
+    padding-block: var(--space-3) var(--space-1);
+  }
+
+  .site-title {
+    grid-area: title;
+    justify-self: start;
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-heading);
+    text-decoration: none;
+  }
+
+  .site-nav {
+    grid-area: nav;
+    /* 좁은 화면에서 메뉴가 넘치면 가로로 밀어서 본다. */
+    overflow-x: auto;
+    margin-inline: calc(var(--space-2) * -1);
+  }
+
+  .site-nav ul {
+    display: flex;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-nav a {
+    display: block;
+    padding: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .site-nav a:hover {
+    color: var(--color-accent);
+  }
+
+  .site-nav a[aria-current] {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.5em;
+  }
+
+  /* scroll 영역 밖으로 나가면 잘리므로 focus ring을 안쪽에 그린다. */
+  .site-nav a:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .inner > :global(.theme-toggle) {
+    grid-area: toggle;
+    margin-inline-end: calc(var(--space-2) * -1);
+  }
+
+  @media (min-width: 720px) {
+    .inner {
+      grid-template-columns: 1fr auto auto;
+      grid-template-areas: 'title nav toggle';
+      column-gap: var(--space-3);
+      min-height: 4rem;
+      padding-block: var(--space-2);
+    }
+
+    .site-nav {
+      overflow-x: visible;
+      margin-inline: 0;
+    }
+
+    .site-nav ul {
+      gap: var(--space-2);
+    }
+  }
+</style>

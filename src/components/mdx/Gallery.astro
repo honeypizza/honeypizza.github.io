@@ -1,0 +1,60 @@
+---
+/**
+ * 사진 여러 장을 격자로. 안에는 Markdown 이미지를 그대로 쓴다 (위아래 빈 줄 필수).
+ *
+ *   <Gallery caption="전체 캡션" columns={2}>
+ *
+ *   ![첫 번째 사진](./a.jpg)
+ *   ![두 번째 사진](./b.jpg)
+ *
+ *   </Gallery>
+ */
+export interface Props {
+  caption?: string;
+  /** 한 줄에 놓을 사진 수 (화면 폭과 상관없이 같다) */
+  columns?: 2 | 3;
+  /** 사진 비율 (기본 "4 / 3"). "original"이면 자르지 않는다. */
+  ratio?: string;
+}
+
+const { caption, columns = 2, ratio = '4 / 3' } = Astro.props;
+const crop = ratio !== 'original';
+---
+
+<figure class="gallery" style={`--columns: ${columns}; --ratio: ${crop ? ratio : 'auto'}`} data-crop={crop}>
+  <div class="grid"><slot /></div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  /* 3열도 휴대폰에서 3열 그대로 (2+1로 갈라지면 한 장만 덩그러니 남는다) */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+    gap: var(--space-2);
+    align-items: start;
+  }
+
+  /* Markdown이 만든 <p>, <figure> 껍데기는 없는 것처럼 다룬다. */
+  .grid > :global(p) {
+    display: contents;
+  }
+
+  .grid :global(figure) {
+    margin: 0;
+  }
+
+  /* 한 장짜리 사진의 높이 제한(content-blocks.css)은 격자 안에서는 풀어 준다. */
+  .grid :global(img) {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+  }
+
+  [data-crop='true'] .grid :global(img) {
+    aspect-ratio: var(--ratio);
+    height: auto;
+    object-fit: cover;
+  }
+</style>

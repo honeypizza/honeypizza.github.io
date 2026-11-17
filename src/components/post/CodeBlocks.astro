@@ -1,0 +1,50 @@
+---
+// 글 본문의 code block마다 언어 표시와 복사 버튼을 붙인다. markup은 없고 script만 있다.
+// (모양은 content-blocks.css의 .code-block, .code-block__lang, .code-block__copy)
+---
+
+<script>
+  document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.replaceWith(wrapper);
+    wrapper.append(pre);
+
+    const lang = pre.dataset.language;
+    if (lang && !['plaintext', 'text', 'txt'].includes(lang)) {
+      const label = document.createElement('span');
+      label.className = 'code-block__lang';
+      label.textContent = lang;
+      wrapper.append(label);
+    }
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'code-block__copy';
+    button.textContent = '복사';
+    button.setAttribute('aria-label', '코드 복사');
+
+    // 결과는 화면 읽기 프로그램에 따로 알린다.
+    const status = document.createElement('span');
+    status.className = 'sr-only';
+    status.setAttribute('role', 'status');
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    button.addEventListener('click', async () => {
+      clearTimeout(timer);
+      try {
+        await navigator.clipboard.writeText(pre.querySelector('code')?.innerText ?? pre.innerText);
+        button.textContent = '복사됨';
+        status.textContent = '코드를 복사했습니다';
+      } catch {
+        button.textContent = '복사 실패';
+        status.textContent = '복사하지 못했습니다';
+      }
+      timer = setTimeout(() => {
+        button.textContent = '복사';
+        status.textContent = '';
+      }, 2000);
+    });
+    wrapper.append(button, status);
+  });
+</script>

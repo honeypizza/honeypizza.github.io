@@ -1,0 +1,91 @@
+---
+/**
+ * 동영상 파일을 본문에 넣는다. 글 폴더에 영상을 두고 import해서 쓴다.
+ *
+ *   import walk from './walk.mp4';
+ *   import walkPoster from './walk-poster.jpg';
+ *   <Video src={walk} poster={walkPoster} caption="캡션" />
+ *
+ *   <Video src={clip} autoplay caption="GIF처럼 소리 없이 반복 재생" />
+ *
+ *   import walkSubs from './walk.vtt?url';
+ *   <Video src={walk} captions={walkSubs} caption="자막이 있는 영상" />
+ */
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+
+export interface Props {
+  /** import한 동영상(.mp4 / .webm / .mov), 또는 public/ 기준 경로 */
+  src: string;
+  /** 재생 전 보여줄 이미지 (import한 이미지 또는 경로) */
+  poster?: ImageMetadata | string;
+  caption?: string;
+  /** 화면 낭독기용 설명. 캡션과 다른 설명이 필요할 때만 쓴다. */
+  label?: string;
+  /** GIF처럼 소리 없이 자동·반복 재생 (기기에서 '동작 줄이기'를 켠 사람에게는 자동 재생하지 않는다) */
+  autoplay?: boolean;
+  /** 한국어 자막 파일(.vtt). import할 때 끝에 ?url을 붙인다. */
+  captions?: string;
+}
+
+const { src, poster, caption, label, autoplay = false, captions } = Astro.props;
+
+// 글 폴더의 파일을 "./a.mp4" 문자열로 넣으면 배포 후 깨지므로 build에서 바로 알린다.
+for (const path of [src, poster]) {
+  if (typeof path === 'string' && /^\.\.?\//.test(path)) {
+    throw new Error('영상·사진 파일은 글 맨 위에서 import 한 뒤 src={이름}처럼 중괄호로 넣어 주세요. (' + path + ')');
+  }
+}
+
+const posterImage = poster && typeof poster !== 'string' ? poster : undefined;
+const posterSrc = posterImage
+  ? (await getImage({ src: posterImage, width: Math.min(posterImage.width, 1400), format: 'webp', layout: 'none' })).src
+  : typeof poster === 'string'
+    ? poster
+    : undefined;
+
+// iPhone의 .mov도 대개 H.264/HEVC라서 mp4로 알려 줘야 Chrome·Firefox가 재생을 시도한다.
+const ext = src.split('?')[0].split('.').pop()?.toLowerCase();
+const type = ext === 'webm' ? 'video/webm' : 'video/mp4';
+---
+
+<figure class="video">
+  <video
+    controls
+    playsinline
+    preload={poster ? 'none' : 'metadata'}
+    poster={posterSrc}
+    width={posterImage?.width}
+    height={posterImage?.height}
+    autoplay={autoplay}
+    muted={autoplay}
+    loop={autoplay}
+    aria-label={label}
+  >
+    <source src={src} type={type} />
+    {captions && <track kind="captions" src={captions} srclang="ko" label="한국어" default />}
+    <p>이 브라우저에서는 동영상을 재생할 수 없습니다. <a href={src}>동영상 파일 열기</a></p>
+  </video>
+  {
+    autoplay && (
+      <script is:inline>
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          const video = document.currentScript.previousElementSibling;
+          video.removeAttribute('autoplay');
+          video.pause();
+        }
+      </script>
+    )
+  }
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  /* 사진과 같은 폭·모서리. 세로 영상은 화면 높이를 넘지 않게 줄이고 남는 자리는 옅은 면으로 둔다. */
+  video {
+    width: 100%;
+    max-height: min(80svh, 50rem);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+</style>

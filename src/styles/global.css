@@ -1,0 +1,173 @@
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/layout.css';
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* 화면 위에 붙는 bar가 있으면 그 page에서 --sticky-offset에 bar 높이를 넣는다. */
+  scroll-padding-top: calc(var(--sticky-offset, 0px) + var(--space-6));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+svg,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  /* 가변 글꼴인 Source Serif(라틴)만 430으로 가볍게 해 한글 Noto Serif KR(500만 로드)과 굵기를 맞춘다.
+     한글은 430을 요청해도 500이 쓰인다. sans로 바꾼 제목은 각자 font-weight를 지정한다. */
+  font-weight: 430;
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+::selection {
+  background: var(--color-selection);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: calc(var(--width-page) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* 목록·소개 page: 왼쪽 끝은 header(logo)에 맞추고, 글줄 폭만 본문 폭으로 제한한다. */
+.narrow {
+  max-width: calc(var(--width-page) + var(--gutter) * 2);
+}
+
+.narrow > * {
+  max-width: var(--width-prose);
+}
+
+/* 목록 페이지 공통 머리말 */
+.page-header {
+  padding-block: var(--section-gap) var(--space-7);
+}
+
+.page-header h1 {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.page-header p {
+  margin-top: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+}
+
+/* "더보기 →" 같은 텍스트 링크 */
+.text-link {
+  display: inline-block;
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+}
+
+.text-link:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}

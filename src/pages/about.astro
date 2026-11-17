@@ -1,0 +1,271 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profile } from '../data/profile';
+
+const { name, tagline, photo, links, intro, education, experience, skills, awards, isSample } = profile;
+
+const timelines = [
+  { id: 'education', title: '학력', items: education },
+  { id: 'experience', title: '경력 · 활동', items: experience },
+];
+---
+
+<BaseLayout title="소개" description={`${name} — ${tagline}`} current="about">
+  <div class="container narrow about">
+    <header class="profile">
+      <div class="identity">
+        <div>
+          <h1>{name}</h1>
+          <p class="tagline">{tagline}</p>
+        </div>
+        {photo && <Image class="photo" src={photo} alt={`${name} 프로필 사진`} width={160} height={160} />}
+      </div>
+      {
+        links.length > 0 && (
+          <dl class="contact">
+            {links.map((link) => (
+              <div class="row">
+                <dt class="key">{link.label}</dt>
+                <dd>
+                  <a href={link.href}>{link.text ?? link.label}</a>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )
+      }
+    </header>
+
+    {
+      isSample && (
+        <p class="sample-notice" role="note">
+          지금 이 페이지의 내용은 모두 예시입니다. <code>src/data/profile.ts</code>를 고치고 <code>isSample</code>을{' '}
+          <code>false</code>로 바꾸면 이 안내가 사라집니다.
+        </p>
+      )
+    }
+
+    <div class="intro">
+      {intro.map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+
+    {
+      timelines.map(
+        (section) =>
+          section.items.length > 0 && (
+            <section class="resume-section" aria-labelledby={section.id}>
+              <h2 id={section.id}>{section.title}</h2>
+              <ol class="rows">
+                {section.items.map((item) => (
+                  <li class="row">
+                    <p class="key">{item.period}</p>
+                    <div>
+                      <p class="item-title">{item.title}</p>
+                      {item.subtitle && <p class="item-subtitle">{item.subtitle}</p>}
+                      {item.notes && item.notes.length > 0 && (
+                        <ul class="notes">
+                          {item.notes.map((note) => (
+                            <li>{note}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ),
+      )
+    }
+
+    {
+      skills.length > 0 && (
+        <section class="resume-section" aria-labelledby="skills">
+          <h2 id="skills">기술 스택</h2>
+          <ul class="rows">
+            {skills.map((group) => (
+              <li class="row">
+                <p class="key">{group.group}</p>
+                <p>{group.items.join(', ')}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      awards.length > 0 && (
+        <section class="resume-section" aria-labelledby="awards">
+          <h2 id="awards">수상 · 자격</h2>
+          <ol class="rows">
+            {awards.map((award) => (
+              <li class="row">
+                <p class="key">{award.date}</p>
+                <div>
+                  <p class="item-title">{award.title}</p>
+                  {award.issuer && <p class="item-subtitle">{award.issuer}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    /* 왼쪽 열(기간·항목 이름) 너비 — 연락처와 이력 표가 같은 선에 맞춰진다. */
+    --key-width: 10rem;
+    padding-top: var(--section-gap);
+  }
+
+  .identity {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-5);
+  }
+
+  h1 {
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .tagline {
+    margin-top: var(--space-3);
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  .photo {
+    flex-shrink: 0;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* 이력 한 줄: 모바일은 위아래로, 넓은 화면은 왼쪽 열 | 오른쪽 열 */
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1) var(--space-5);
+  }
+
+  .key {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .contact {
+    margin-top: var(--space-6);
+    font-size: var(--text-sm);
+  }
+
+  .contact .row {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+  }
+
+  .contact a {
+    display: inline-block;
+    color: var(--color-accent);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .contact a:hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+  }
+
+  .sample-notice {
+    margin-top: var(--space-6);
+    padding-left: var(--space-5);
+    border-left: 1px solid var(--color-border-strong);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .sample-notice code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--color-text);
+  }
+
+  .intro {
+    margin-top: var(--space-7);
+  }
+
+  .intro p + p {
+    margin-top: var(--space-4);
+  }
+
+  .resume-section {
+    margin-top: var(--space-8);
+  }
+
+  /* 홈·목록과 같은 조용한 section label. 아래 1px 선이 표의 윗선이 된다. */
+  .resume-section h2 {
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-label);
+  }
+
+  .rows {
+    padding: 0;
+    list-style: none;
+  }
+
+  .rows .row {
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .item-title {
+    font-weight: var(--weight-semibold);
+  }
+
+  .item-subtitle {
+    color: var(--color-text-muted);
+  }
+
+  .notes {
+    margin-top: var(--space-2);
+    padding-left: 1.1em;
+    list-style: disc;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  .notes li + li {
+    margin-top: var(--space-1);
+  }
+
+  .notes li::marker {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 560px) {
+    .photo {
+      width: 7.5rem;
+      height: 7.5rem;
+    }
+
+    .row,
+    .contact .row {
+      grid-template-columns: var(--key-width) minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+</style>

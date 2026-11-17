@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Typography tokens
+   ========================================================================== */
+
+:root {
+  /* Font — 웹폰트(BaseLayout에서 로드) 다음은 OS별 한글 fallback.
+     'Pretendard Fallback'은 Windows 맑은 고딕을 Pretendard 크기에 맞춘 것 (글꼴이 늦게 와도 줄이 덜 밀린다) */
+  --font-sans: 'Pretendard Variable', Pretendard, 'Pretendard Fallback', -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+    'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  /* 라틴은 Source Serif 4, 한글은 Noto Serif KR → 같은 디자인의 CJK판 → 나눔명조(설치 시) → macOS → Windows */
+  --font-serif: 'Source Serif 4 Variable', 'Noto Serif KR', Georgia, 'Noto Serif CJK KR', 'Nanum Myeongjo',
+    'AppleMyungjo', 'Batang', serif;
+  /* 라틴은 OS 기본 고정폭, 코드 속 한글(주석 등)은 D2Coding(설치 시) → OS 한글 고딕 */
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'JetBrains Mono', 'D2Coding', 'Noto Sans Mono CJK KR',
+    'Apple SD Gothic Neo', 'Malgun Gothic', monospace;
+
+  /* Type scale — 큰 크기는 화면 폭 390px→1280px 사이에서 부드럽게 커진다 (주석: 390 → 1280 기준 px) */
+  --text-xs: 0.75rem; /* 12 — 라벨, 개수, 코드 언어 표시 */
+  --text-sm: 0.875rem; /* 14 — 메타(날짜·분량), 캡션, 각주 */
+  --text-base: 1.0625rem; /* 17 — 본문 (모바일도 같음) */
+  --text-md: 1.1875rem; /* 19 — 리드(요약문), 인용문 */
+  --text-lg: clamp(1.25rem, 1.2rem + 0.22vw, 1.375rem); /* 20→22 — H3 */
+  --text-xl: clamp(1.5rem, 1.39rem + 0.45vw, 1.75rem); /* 24→28 — H2 */
+  --text-2xl: clamp(1.75rem, 1.53rem + 0.9vw, 2.25rem); /* 28→36 — 목록 페이지 제목 */
+  --text-3xl: clamp(2rem, 1.56rem + 1.8vw, 3rem); /* 32→48 — 글 제목(H1) */
+  --text-statement: clamp(1.5rem, 1.06rem + 1.8vw, 2.5rem); /* 24→40 — 홈 첫 화면의 큰 serif 문장 */
+  --text-label: var(--text-xs); /* 12 — 조용한 섹션 라벨·개수 (--tracking-label, tabular-nums와 함께) */
+
+  /* Line height */
+  --leading-body: 1.8; /* 본문 — 한글은 1.7~1.8 */
+  --leading-snug: 1.55; /* 리드, 목록 요약, 캡션처럼 1~3줄짜리 글 */
+  --leading-heading: 1.35; /* H2·H3, 홈 문장 — 한글 제목이 두 줄이 돼도 답답하지 않게 */
+  --leading-tight: 1.2; /* H1처럼 큰 제목 */
+
+  /* Letter spacing */
+  --tracking-tight: -0.02em; /* 큰 serif 제목(H1, 홈 문장) */
+  --tracking-heading: -0.01em; /* H2·H3 */
+  --tracking-label: 0.04em; /* 작은 라벨 — 한글이라 살짝만 */
+
+  /* Font weight — serif 한글(Noto Serif KR)은 500만 로드한다. serif에는 --weight-medium 이하만 쓴다. */
+  --weight-regular: 400; /* 본문 */
+  --weight-medium: 500; /* serif 제목, 목록 글 제목, 라벨 */
+  --weight-semibold: 600; /* 강조(strong), H4, 홈 문장 앞의 이름(sans) */
+}

@@ -1,0 +1,37 @@
+---
+import { CATEGORIES, type Category } from '../lib/posts';
+
+export interface Props {
+  category: Category;
+  /** true면 해당 category 목록으로 가는 링크가 된다. */
+  link?: boolean;
+}
+
+const { category, link = false } = Astro.props;
+const { label, href } = CATEGORIES[category];
+---
+
+{
+  link ? (
+    <a class="category-label" href={href}>
+      {label}
+    </a>
+  ) : (
+    <span class="category-label">{label}</span>
+  )
+}
+
+<style>
+  /* 상자 없이 글자만. 크기는 놓인 자리(메타 줄)의 크기를 따른다. */
+  .category-label {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  a.category-label:hover,
+  a.category-label:focus-visible {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+</style>

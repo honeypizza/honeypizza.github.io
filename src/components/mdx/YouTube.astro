@@ -1,0 +1,54 @@
+---
+/**
+ * YouTube 동영상. 용량이 큰 영상은 파일로 넣지 말고 YouTube에 올린 뒤 이걸로 넣는다.
+ *
+ *   <YouTube id="https://youtu.be/XXXXXXXXXXX" title="영상 제목" caption="캡션" />
+ *
+ * id에는 영상 주소를 그대로 넣거나, 주소 https://www.youtube.com/watch?v=XXXXXXXXXXX 의
+ * XXXXXXXXXXX(11자리) 부분만 넣는다. (youtu.be, shorts, embed, live 주소도 된다)
+ */
+export interface Props {
+  /** 영상 주소, 또는 11자리 영상 ID */
+  id: string;
+  /** iframe 제목 (화면 낭독기용, 필수) */
+  title: string;
+  caption?: string;
+  /** 시작 위치(초) */
+  start?: number;
+}
+
+const { id, title, caption, start } = Astro.props;
+
+const raw = String(id ?? '');
+const videoId = raw.match(/(?:youtu\.be\/|[?&]v=|shorts\/|embed\/|live\/)([\w-]{11})/)?.[1] ?? raw.trim();
+if (!/^[\w-]{11}$/.test(videoId)) {
+  throw new Error('YouTube 영상 주소나 11자리 영상 ID를 id="…"에 넣어 주세요. (' + raw + ')');
+}
+if (!title?.trim()) {
+  throw new Error('YouTube에는 화면 낭독기를 위한 영상 제목 title="…"이 필요합니다. (' + raw + ')');
+}
+
+const src = `https://www.youtube-nocookie.com/embed/${videoId}${start ? `?start=${start}` : ''}`;
+---
+
+<figure class="youtube">
+  <iframe
+    src={src}
+    title={title}
+    loading="lazy"
+    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  /* 사진·동영상과 같은 폭·모서리 */
+  iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+</style>

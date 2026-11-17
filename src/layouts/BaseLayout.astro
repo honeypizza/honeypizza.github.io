@@ -1,0 +1,85 @@
+---
+// 글꼴: 모두 unicode-range 조각이라 페이지에 쓰인 글자의 조각만 받는다. 그래서 preload는 하지 않는다.
+// - Pretendard: 가변(45–920) 하나로 모든 굵기
+// - Source Serif 4: 가변 wght 축만 (opsz판은 파일이 2.4배)
+// - Noto Serif KR: 500만. serif에 600 이상을 주면 한글은 가짜 굵기가 된다.
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+import '@fontsource-variable/source-serif-4';
+import '@fontsource/noto-serif-kr/500.css';
+import '../styles/global.css';
+
+import BaseHead, { type Props as HeadProps } from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE, type NavKey } from '../consts';
+
+export interface Props extends HeadProps {
+  /** 상단 메뉴에서 현재 위치로 표시할 항목 */
+  current?: NavKey;
+}
+
+const { current, ...head } = Astro.props;
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <BaseHead {...head} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <Header current={current} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    z-index: 10;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-text);
+    color: var(--color-bg);
+    border-radius: 4px;
+    text-decoration: none;
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus {
+    transform: none;
+  }
+
+  main {
+    flex: 1;
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>
+
+<style is:global>
+  /* Pretendard가 오기 전 잠깐 보이는 Windows 한글(맑은 고딕, 한 글자 1em)을 Pretendard 한글 폭(0.864em)에 맞춘다.
+     글꼴이 바뀔 때 줄바꿈이 달라져 화면이 밀리는 것(CLS)을 막는다. 맑은 고딕이 없는 OS에서는 그냥 건너뛴다.
+     --font-sans(typography.css)에서 Pretendard 바로 뒤에 둔다. */
+  @font-face {
+    font-family: 'Pretendard Fallback';
+    src: local('Malgun Gothic'), local('MalgunGothic');
+    size-adjust: 86.4%;
+    unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7A3, U+D7B0-D7FF;
+  }
+
+  @font-face {
+    font-family: 'Pretendard Fallback';
+    font-weight: 700;
+    src: local('Malgun Gothic Bold'), local('MalgunGothicBold');
+    size-adjust: 86.4%;
+    unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7A3, U+D7B0-D7FF;
+  }
+</style>

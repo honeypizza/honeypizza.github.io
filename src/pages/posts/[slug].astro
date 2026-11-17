@@ -1,0 +1,29 @@
+---
+import type { InferGetStaticPropsType } from 'astro';
+import { render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { mdxComponents } from '../../components/mdx';
+import { getPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => {
+    // 이전/다음 글은 같은 category 안에서 고른다. 목록이 최신순이라 index + 1이 더 오래된 글이다.
+    const siblings = posts.filter((p) => p.data.category === post.data.category);
+    const index = siblings.indexOf(post);
+    return {
+      params: { slug: post.id },
+      props: { post, prev: siblings[index + 1], next: siblings[index - 1] },
+    };
+  });
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { post, prev, next } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<PostLayout post={post} headings={headings} prev={prev} next={next}>
+  <Content components={mdxComponents} />
+</PostLayout>

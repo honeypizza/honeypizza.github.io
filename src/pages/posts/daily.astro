@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostArchive from '../../components/PostArchive.astro';
+import { CATEGORIES, getPosts } from '../../lib/posts';
+
+const { label: title, description } = CATEGORIES.daily;
+const posts = await getPosts('daily');
+---
+
+<BaseLayout title={title} description={description} current="daily">
+  <div class="container narrow">
+    <header class="page-header">
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </header>
+    <PostArchive posts={posts} active="daily" />
+  </div>
+</BaseLayout>

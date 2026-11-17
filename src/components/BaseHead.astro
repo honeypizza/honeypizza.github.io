@@ -1,0 +1,120 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import { SITE } from '../consts';
+import { profile } from '../data/profile';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  /**
+   * 공유(Open Graph) 이미지. 글 cover처럼 import한 이미지를 넘기면 가로 1200px 이하 jpg로 만든다.
+   * 문자열은 절대 주소나 사이트 기준 경로. 없으면 /og-default.png(1200×630)를 쓴다.
+   */
+  image?: ImageMetadata | string;
+  imageAlt?: string;
+  article?: { publishedTime: Date; tags?: string[]; section?: string };
+  noindex?: boolean;
+}
+
+const { title, description = SITE.description, image, imageAlt, article, noindex = false } = Astro.props;
+
+const fullTitle = title ? `${title} · ${SITE.title}` : SITE.title;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+let og: { url: string; width?: number; height?: number; alt?: string } = {
+  url: new URL('/og-default.png', Astro.site).href,
+  width: 1200,
+  height: 630,
+  alt: SITE.title,
+};
+if (typeof image === 'string') {
+  og = { url: new URL(image, Astro.site).href, alt: imageAlt };
+} else if (image && image.format !== 'svg') {
+  // SVG는 공유 미리보기에서 지원되지 않으므로 기본 이미지를 쓴다.
+  const width = Math.min(1200, image.width);
+  const height = Math.round((image.height * width) / image.width);
+  // layout 'none': srcset 없이 파일 하나만. 투명 PNG는 배경색으로 채운다 (jpg는 투명을 검게 만든다).
+  const { src } = await getImage({ src: image, width, format: 'jpg', layout: 'none', background: '#faf9f5' });
+  og = { url: new URL(src, Astro.site).href, width, height, alt: imageAlt };
+}
+
+// 구조화 data: 글에는 BlogPosting, 홈에는 WebSite.
+const published = article?.publishedTime.toISOString();
+const jsonLd = article
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      datePublished: published,
+      dateModified: published,
+      author: {
+        '@type': 'Person',
+        name: profile.name,
+        url: new URL('/about/', Astro.site).href,
+        sameAs: profile.links.filter((link) => link.href.startsWith('https://')).map((link) => link.href),
+      },
+      image: og.url,
+      url: canonical,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+      inLanguage: SITE.lang,
+    }
+  : Astro.url.pathname === '/'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE.title,
+        description: SITE.description,
+        url: new URL('/', Astro.site).href,
+        inLanguage: SITE.lang,
+      }
+    : undefined;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+{noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+
+<meta name="color-scheme" content="light dark" />
+<!-- colors.css의 --color-bg와 같은 값 -->
+<meta name="theme-color" content="#faf9f5" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1b1a18" media="(prefers-color-scheme: dark)" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="alternate" type="application/rss+xml" title={SITE.title} href={new URL('rss.xml', Astro.site)} />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={article ? 'article' : 'website'} />
+<meta property="og:site_name" content={SITE.title} />
+<meta property="og:locale" content={SITE.locale} />
+<meta property="og:title" content={title ?? SITE.title} />
+<meta property="og:description" content={description} />
+{!noindex && <meta property="og:url" content={canonical} />}
+<meta property="og:image" content={og.url} />
+{og.width && <meta property="og:image:width" content={String(og.width)} />}
+{og.height && <meta property="og:image:height" content={String(og.height)} />}
+{og.alt && <meta property="og:image:alt" content={og.alt} />}
+{article && <meta property="article:published_time" content={article.publishedTime.toISOString()} />}
+{article?.section && <meta property="article:section" content={article.section} />}
+{article?.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title ?? SITE.title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={og.url} />
+{og.alt && <meta name="twitter:image:alt" content={og.alt} />}
+
+{jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
+
+<!-- 저장된 theme을 첫 paint 전에 적용해서 깜빡임을 막는다. -->
+<script is:inline>
+  try {
+    const theme = localStorage.getItem('theme');
+    if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+  } catch {}
+</script>
