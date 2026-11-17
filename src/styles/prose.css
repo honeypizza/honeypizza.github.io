@@ -106,8 +106,8 @@
   color: var(--color-accent);
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
-  /* 밑줄만으로도 링크임을 알 수 있게. 배경 대비 dark 3.46:1, light 2.73:1 */
-  text-decoration-color: color-mix(in srgb, currentColor 65%, transparent);
+  /* 밑줄은 하늘색 장식색으로. 글자는 --color-accent라 읽기 대비는 따로 지킨다 */
+  text-decoration-color: var(--color-accent-soft);
   text-underline-offset: 0.25em;
   transition:
     color 0.15s ease,

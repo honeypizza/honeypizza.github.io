@@ -1,7 +1,7 @@
 /**
  * 새 글 폴더와 index.mdx를 만든다.
  *
- *   npm run new -- <daily|tech> <slug> "제목"
+ *   npm run new -- <daily|study> <slug> "제목"
  *   npm run new -- daily first-snow "첫눈 온 날"
  *
  * → src/content/posts/daily/first-snow/index.mdx (draft: true 상태로 생성)
@@ -13,16 +13,16 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const postsDir = join(root, 'src', 'content', 'posts');
 
-const CATEGORIES = ['daily', 'tech'];
+const CATEGORIES = ['daily', 'study'];
 /** src/content.config.ts의 RESERVED_SLUGS와 같다. */
-const RESERVED_SLUGS = ['daily', 'tech', 'index'];
+const RESERVED_SLUGS = ['daily', 'study', 'index'];
 
 /** 화면에 보여 줄 경로 (Windows에서도 / 로) */
 const show = (path) => relative(root, path).split(sep).join('/');
 
 function fail(message) {
   console.error(`\n  ✗ ${message}\n`);
-  console.error('  사용법: npm run new -- <daily|tech> <slug> "제목"');
+  console.error('  사용법: npm run new -- <daily|study> <slug> "제목"');
   console.error('  예시:   npm run new -- daily first-snow "첫눈 온 날"\n');
   process.exit(1);
 }
@@ -44,7 +44,7 @@ const category = categoryArg.trim().toLowerCase();
 const slug = slugArg.trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/-{2,}/g, '-');
 const title = titleWords.join(' ').trim() || '제목을 적어 주세요';
 
-if (!CATEGORIES.includes(category)) fail('category는 daily 또는 tech 중 하나여야 합니다.');
+if (!CATEGORIES.includes(category)) fail('category는 daily 또는 study 중 하나여야 합니다.');
 if (!slug) fail('글 주소로 쓸 slug를 적어 주세요. 예: first-snow');
 if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
   fail(`slug에 쓸 수 없는 글자가 있습니다: "${slugArg}". 영어 소문자, 숫자, 하이픈(-)만 쓸 수 있습니다. 예: first-snow`);
@@ -122,7 +122,7 @@ const body = {
 
 여기에 글을 씁니다.
 `,
-  tech: `
+  study: `
 여기에 도입 문단을 씁니다. 무엇을, 왜 다루는지 두세 문장이면 충분합니다.
 
 ## 첫 번째 소제목

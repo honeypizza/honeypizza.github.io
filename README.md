@@ -1,6 +1,6 @@
 # haein’s blog
 
-일상과 기술 이야기를 천천히 적는 개인 블로그 **haein’s blog**의 소스 코드예요. (저장소: `honeypizza.github.io`)
+일상과 공부 이야기를 천천히 적는 개인 블로그 **haein’s blog**의 소스 코드예요. (저장소: `honeypizza.github.io`)
 [Astro](https://astro.build)로 테마 없이 직접 만든 정적 사이트이고, `main` 브랜치에 push하면
 GitHub Actions가 <https://honeypizza.github.io>에 자동으로 배포해요.
 
@@ -27,13 +27,13 @@ GitHub Actions가 <https://honeypizza.github.io>에 자동으로 배포해요.
 
 | 주소 | 내용 |
 | --- | --- |
-| `/` | 홈. 짧은 소개와 최근 기술 글·최근 일상 글 |
+| `/` | 홈. 짧은 소개와 최근 공부 글·최근 일상 글 |
 | `/posts/` | 전체 글 (연도별 목록) |
-| `/posts/daily/`, `/posts/tech/` | 일상 글, 기술 글만 모아 보기 |
+| `/posts/daily/`, `/posts/study/` | 일상 글, 공부 글만 모아 보기 |
 | `/posts/<slug>/` | 글 하나. 소제목이 2개 이상이면 번호가 붙은 목차가 함께 보여요 |
 | `/tags/`, `/tags/<태그>/` | 태그 목록, 태그별 글 |
 | `/about/` | 소개 (학력, 경력, 기술, 수상 등) |
-| `/rss.xml` | RSS 피드 |
+| `/rss.xml` | RSS 피드 (화면에 링크는 없어요. RSS 앱에 블로그 주소를 넣으면 자동으로 찾아요) |
 
 시스템 설정을 따르는 다크 모드와 전환 버튼, 사이트맵, 검색·공유용 메타 정보(Open Graph)가 들어 있어요.
 
@@ -77,7 +77,7 @@ npm run dev     # 미리보기 서버 시작
 | --- | --- |
 | `npm install` | 필요한 패키지를 설치해요. 처음 한 번, 또는 `package.json`이 바뀐 뒤에 실행해요 |
 | `npm run dev` | 미리보기 서버(<http://localhost:4321>). 저장하면 바로 반영되고, **초안**(`draft: true`) 글도 보여요 |
-| `npm run new -- <daily\|tech> <slug> "제목"` | 새 글 폴더와 `index.mdx`를 초안으로 만들어요 |
+| `npm run new -- <daily\|study> <slug> "제목"` | 새 글 폴더와 `index.mdx`를 초안으로 만들어요 |
 | `npm run build` | 배포용 사이트를 `dist/` 폴더에 만들어요. 초안은 빠져요. 배포 전에 오류를 확인할 때도 좋아요 |
 | `npm run preview` | `build`로 만든 결과를 <http://localhost:4321>에서 그대로 미리 봐요 |
 | `npm run check` | 코드와 설정의 타입 오류를 검사해요 (`astro check`) |
@@ -92,7 +92,7 @@ npm run dev     # 미리보기 서버 시작
 ├── public/                        그대로 복사되는 파일 (favicon.svg, og-default.png)
 ├── scripts/new-post.mjs           npm run new (새 글 만들기)
 ├── src/
-│   ├── content/posts/             글. daily/, tech/ 아래에 글마다 폴더 하나
+│   ├── content/posts/             글. daily/, study/ 아래에 글마다 폴더 하나
 │   ├── data/profile.ts            소개 페이지와 홈 상단의 내용
 │   ├── consts.ts                  사이트 이름·설명·상단 메뉴
 │   ├── content.config.ts          글 정보(frontmatter) 규칙
@@ -121,7 +121,7 @@ npm run dev     # 미리보기 서버 시작
    ```
 
    `src/content/posts/daily/first-snow/index.mdx`가 **초안**(`draft: true`)으로 만들어져요.
-   `daily`는 일상, `tech`는 기술이고, `first-snow`는 글 주소(`/posts/first-snow/`)예요.
+   `daily`는 일상, `study`는 공부이고, `first-snow`는 글 주소(`/posts/first-snow/`)예요.
    주소는 **영어 소문자, 숫자, 하이픈**(-)으로 지어요. 대문자·밑줄은 알아서 고쳐 주고, 한글이나 기호가 있으면 다시 적어 달라고 알려 줘요.
 
 2. **쓰기·미리보기**: 같은 폴더에 사진·동영상을 넣고 글을 써요. `npm run dev`를 켜 두고
@@ -147,14 +147,14 @@ toc: false                   # 목차 숨기기 (짧은 글에 어울려요)
 
 본문에 사진은 `![사진 설명](./photo.jpg "캡션")` 한 줄로 넣어요.
 
-### 기술 글 frontmatter 예시
+### 공부 글 frontmatter 예시
 
 ```yaml
 ---
 title: "Astro로 RSS 피드 붙이기"
 description: "@astrojs/rss로 블로그에 RSS를 붙이면서 정리한 순서와 주의할 점."
 date: 2026-12-03 21:30           # 시간은 선택 (한국 시간)
-category: tech
+category: study
 tags: [Astro, RSS]
 draft: true                      # 다 쓰면 이 줄을 지워요
 ---
@@ -165,7 +165,7 @@ draft: true                      # 다 쓰면 이 줄을 지워요
 | `title` | 필수 | 글 제목 |
 | `description` | 필수 | 한 줄 요약 (목록, 글 상단, 검색·공유 미리보기, RSS) |
 | `date` | 필수 | 작성일 `2026-11-28`, 시간까지 `2026-11-28 21:30` |
-| `category` | 필수 | `daily` 또는 `tech` |
+| `category` | 필수 | `daily` 또는 `study` |
 | `tags` | 선택 | `[태그1, 태그2]` 또는 `태그1, 태그2` (`#`은 붙이지 않아요) |
 | `toc` | 선택 | `false`면 목차 숨김. 목차는 `##` 소제목이 2개 이상일 때 보여요 |
 | `cover`, `coverAlt` | 선택 | 대표 이미지(`./cover.jpg`처럼 `./`로 시작)와 그 설명 |
@@ -226,7 +226,7 @@ education: [
 | --- | --- |
 | 사이트 이름, 기본 설명 (헤더, 브라우저 탭, 검색 결과, RSS) | `src/consts.ts`의 `SITE` (`title`, `description`) |
 | 상단 메뉴 이름 | `src/consts.ts`의 `NAV` (`label`만 바꾸고 `key`는 그대로 둬요) |
-| 분류 이름(일상·기술)과 목록 페이지 설명 | `src/lib/posts.ts`의 `CATEGORIES` |
+| 분류 이름(일상·공부)과 목록 페이지 설명 | `src/lib/posts.ts`의 `CATEGORIES` |
 | 사이트 주소 | `astro.config.mjs`의 `site` |
 | 색 (라이트·다크 모드) | `src/styles/tokens/colors.css`. `light-dark(라이트 색, 다크 색)` 한 쌍으로 적어요 |
 | 글꼴, 글자 크기, 줄 간격 | `src/styles/tokens/typography.css` |
@@ -327,7 +327,7 @@ git push
 
 | 예시 | 위치 |
 | --- | --- |
-| 기술 글 2편 | `src/content/posts/tech/building-this-blog/`, `src/content/posts/tech/korean-typography-css/` |
+| 공부 글 2편 | `src/content/posts/study/building-this-blog/`, `src/content/posts/study/korean-typography-css/` |
 | 일상 글 2편 | `src/content/posts/daily/late-autumn-walk/`, `src/content/posts/daily/morning-coffee/` |
 | 소개 내용 | `src/data/profile.ts` (내용을 바꾼 뒤 `isSample: false`) |
 

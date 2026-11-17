@@ -9,7 +9,6 @@ const github = profile.links.find((link) => link.label === 'GitHub');
   <div class="container inner">
     <p>© {year} {profile.name}</p>
     <ul>
-      <li><a href="/rss.xml">RSS</a></li>
       <li><a href="/tags/">태그</a></li>
       {github && <li><a href={github.href}>GitHub</a></li>}
     </ul>

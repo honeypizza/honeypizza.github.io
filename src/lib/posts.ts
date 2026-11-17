@@ -7,7 +7,7 @@ export type Category = Post['data']['category'];
 
 export const CATEGORIES: Record<Category, { label: string; href: string; description: string }> = {
   daily: { label: '일상', href: '/posts/daily/', description: '사진과 짧은 글로 남기는 하루하루의 기록' },
-  tech: { label: '기술', href: '/posts/tech/', description: '만들고, 배우고, 시행착오를 겪은 기술 이야기' },
+  study: { label: '공부', href: '/posts/study/', description: '배우고 익힌 것을 차근차근 정리하는 공부 기록' },
 };
 
 /**

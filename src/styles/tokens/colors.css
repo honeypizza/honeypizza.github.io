@@ -12,12 +12,13 @@
   --color-bg: #faf9f5;
   --color-surface: #f5f4ef;
   --color-text: #141413;
-  --color-text-muted: #6b6963;
+  --color-text-muted: #5f5d58; /* 이전 값 #6b6963 */
   --color-border: #e5e2d9;
   --color-border-strong: #cbc7bc;
-  --color-accent: #2b50c8;
-  --color-accent-hover: #1c3a99;
-  --color-selection: #dde3f2;
+  --color-accent: #0a72b5;
+  --color-accent-hover: #085a8f;
+  --color-accent-soft: #4aa8e0;
+  --color-selection: #d3eaf8;
 }
 
 @supports (color: light-dark(#fff, #000)) {
@@ -27,12 +28,14 @@
     --color-bg: light-dark(#faf9f5, #1b1a18);
     --color-surface: light-dark(#f5f4ef, #23221f); /* code block, inline code */
     --color-text: light-dark(#141413, #e9e6de);
-    --color-text-muted: light-dark(#6b6963, #a29f95);
+    --color-text-muted: light-dark(#5f5d58, #a29f95); /* 라이트 이전 값 #6b6963 */
     --color-border: light-dark(#e5e2d9, #34322d); /* 구분선 */
     --color-border-strong: light-dark(#cbc7bc, #4a4740); /* 인용·callout 선, hover 테두리 (장식용) */
-    --color-accent: light-dark(#2b50c8, #6a88de); /* 군청. 링크, 현재 위치, focus */
-    --color-accent-hover: light-dark(#1c3a99, #8fa5e3);
-    --color-selection: light-dark(#dde3f2, #27324f);
+    /* 하늘색(#4aa8e0) 계열. 라이트는 글자로 읽히게 같은 색조를 깊게, 다크는 하늘색 그대로 */
+    --color-accent: light-dark(#0a72b5, #4aa8e0); /* 링크, 현재 위치, focus */
+    --color-accent-hover: light-dark(#085a8f, #7cc0ea);
+    --color-accent-soft: light-dark(#4aa8e0, #4aa8e0); /* 글자가 아닌 장식(링크 밑줄 등)에만. 라이트에서 2.5:1 */
+    --color-selection: light-dark(#d3eaf8, #163447);
   }
 
   :root[data-theme='light'] {

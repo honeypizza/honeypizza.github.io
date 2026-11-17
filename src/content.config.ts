@@ -6,13 +6,13 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { tagSlug } from './lib/tag-slug';
 
-/** /posts/daily/, /posts/tech/ 페이지와 주소가 겹치거나 헷갈리므로 글 주소로 쓸 수 없다. */
-const RESERVED_SLUGS = new Set(['daily', 'tech', 'index']);
+/** /posts/daily/, /posts/study/ 페이지와 주소가 겹치거나 헷갈리므로 글 주소로 쓸 수 없다. */
+const RESERVED_SLUGS = new Set(['daily', 'study', 'index']);
 
 /**
  * 파일 경로에서 글 주소(slug)를 만든다.
  *   daily/autumn-walk/index.mdx → autumn-walk
- *   tech/hello.md               → hello
+ *   study/hello.md              → hello
  *   daily/첫눈 온 날/index.md     → 첫눈-온-날
  * 대문자는 소문자로, 공백은 하이픈(-)으로 바꾸고 그 밖의 기호는 뺀다.
  * category 폴더는 정리용일 뿐이고, 실제 분류는 frontmatter의 category가 정한다.
@@ -154,7 +154,7 @@ const posts = defineCollection({
         parsePostDate,
         z.date({ error: 'date는 2026-11-10 또는 2026-11-10 21:30 형식으로 적어 주세요.' }),
       ),
-      category: z.enum(['daily', 'tech'], { error: 'category는 daily 또는 tech 중 하나여야 합니다.' }),
+      category: z.enum(['daily', 'study'], { error: 'category는 daily 또는 study 중 하나여야 합니다.' }),
       tags: z.preprocess(normalizeTags, z.array(z.string())).default([]),
       toc: z.boolean().default(true),
       cover: image().optional(),

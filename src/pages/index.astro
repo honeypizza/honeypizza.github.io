@@ -8,7 +8,7 @@ import { CATEGORIES, getPosts, type Category } from '../lib/posts';
 const RECENT_COUNT = 5;
 
 const sections = await Promise.all(
-  (['tech', 'daily'] as Category[]).map(async (category) => {
+  (['study', 'daily'] as Category[]).map(async (category) => {
     const posts = await getPosts(category);
     return { category, ...CATEGORIES[category], total: posts.length, posts: posts.slice(0, RECENT_COUNT) };
   }),
@@ -113,7 +113,7 @@ const sections = await Promise.all(
     color: var(--color-text-muted);
   }
 
-  /* 넓은 화면에서는 기술 | 일상 두 열 */
+  /* 넓은 화면에서는 공부 | 일상 두 열 */
   .recent {
     display: grid;
     gap: var(--section-gap) var(--space-8);

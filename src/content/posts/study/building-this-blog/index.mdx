@@ -2,7 +2,7 @@
 title: 이 블로그를 처음부터 만들며 정한 것들
 description: 테마 없이 Astro로 레이아웃과 CSS를 직접 짜면서 내린 결정을 정리했습니다. (예시 글)
 date: 2026-11-10
-category: tech
+category: study
 tags: [Astro, CSS, 블로그]
 cover: ./cover.jpg
 coverAlt: 여러 색의 책이 꽂힌 책장을 단순하게 그린 예시 그림
@@ -53,7 +53,7 @@ const posts = defineCollection({
       title: z.string(),
       description: z.string(),
       date: z.coerce.date(),
-      category: z.enum(['daily', 'tech']),
+      category: z.enum(['daily', 'study']),
       tags: z.array(z.string()).default([]),
       toc: z.boolean().default(true),
       cover: image().optional(),
@@ -67,7 +67,7 @@ const posts = defineCollection({
 글마다 폴더를 하나씩 만들고, 폴더 이름을 그대로 주소로 씁니다. 사진과 동영상도 같은 폴더에 두기 때문에 글을 옮기거나 지울 때는 폴더 하나만 다루면 됩니다.
 
 ```text
-src/content/posts/tech/building-this-blog/
+src/content/posts/study/building-this-blog/
 ├── index.mdx          → /posts/building-this-blog/
 ├── cover.jpg
 └── layout-sketch.png
