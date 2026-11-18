@@ -49,7 +49,7 @@ export interface Profile {
   /** true인 동안 소개 페이지에 "예시 데이터" 안내가 보인다. */
   isSample: boolean;
   name: string;
-  /** 이름 아래 한 줄 소개 (홈 프로필 카드, 소개 페이지) */
+  /** 이름 아래 한 줄 소개 (홈 상단 프로필, 소개 페이지) */
   tagline: string;
   photo?: ImageMetadata;
   links: Link[];
@@ -66,15 +66,7 @@ export const profile: Profile = {
   name: '김예시',
   tagline: '[예시] 웹 프론트엔드 개발자 · 기록하는 사람',
   // photo,
-  links: [
-    { label: '이메일', href: 'mailto:hello@example.com', text: 'hello@example.com' },
-    { label: 'GitHub', href: 'https://github.com/honeypizza', text: 'github.com/honeypizza' },
-    {
-      label: 'LinkedIn',
-      href: 'https://www.linkedin.com/in/your-linkedin-id',
-      text: 'linkedin.com/in/your-linkedin-id',
-    },
-  ],
+  links: [{ label: 'GitHub', href: 'https://github.com/honeypizza', text: 'github.com/honeypizza' }],
   intro: [
     '[예시] 안녕하세요. 웹 프론트엔드를 중심으로 일하는 김예시입니다. 읽기 좋은 화면, 고치기 쉬운 코드, 그리고 그 둘 사이의 균형에 관심이 많습니다.',
     '[예시] 이 블로그에는 일하며 배우고 공부한 것들과 함께 산책, 커피, 책처럼 소소한 일상을 기록합니다. 이 문단은 src/data/profile.ts에서 고칠 수 있습니다.',

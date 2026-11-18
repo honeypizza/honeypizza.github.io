@@ -21,9 +21,9 @@ export async function getStaticPaths() {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { post, prev, next } = Astro.props;
-const { Content, headings } = await render(post);
+const { Content } = await render(post);
 ---
 
-<PostLayout post={post} headings={headings} prev={prev} next={next}>
+<PostLayout post={post} prev={prev} next={next}>
   <Content components={mdxComponents} />
 </PostLayout>

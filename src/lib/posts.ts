@@ -5,9 +5,9 @@ import { tagSlug } from './tag-slug';
 export type Post = CollectionEntry<'posts'>;
 export type Category = Post['data']['category'];
 
-export const CATEGORIES: Record<Category, { label: string; href: string; description: string }> = {
-  daily: { label: '일상', href: '/posts/daily/', description: '사진과 짧은 글로 남기는 하루하루의 기록' },
-  study: { label: '공부', href: '/posts/study/', description: '배우고 익힌 것을 차근차근 정리하는 공부 기록' },
+export const CATEGORIES: Record<Category, { label: string; href: string }> = {
+  daily: { label: '일상', href: '/posts/daily/' },
+  study: { label: '공부', href: '/posts/study/' },
 };
 
 /**

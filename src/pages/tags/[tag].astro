@@ -14,34 +14,19 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { tag } = Astro.props;
 const title = `#${tag.label}`;
-const count = tag.posts.length;
 ---
 
-<BaseLayout title={title} description={`${title} 태그가 붙은 글 ${count}편 — ${SITE.description}`}>
+<BaseLayout title={title} description={`${title} 태그가 붙은 글 ${tag.posts.length}편 — ${SITE.description}`}>
   <div class="container narrow">
     <header class="page-header">
       <h1>{title}</h1>
-      <p>
-        이 태그가 붙은 글 {count}편{' '}<span aria-hidden="true">·</span>{' '}<a href="/tags/">모든 태그</a>
-      </p>
     </header>
-    <PostArchive posts={tag.posts} tabs={false} />
+    <PostArchive posts={tag.posts} />
   </div>
 </BaseLayout>
 
 <style>
   .page-header h1 {
     overflow-wrap: anywhere;
-  }
-
-  .page-header a {
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .page-header a:hover,
-  .page-header a:focus-visible {
-    color: var(--color-accent-hover);
-    text-decoration: underline;
   }
 </style>

@@ -7,21 +7,19 @@ export interface Props {
   /** dot: 2026.11.17 / short: 11.17 (연도별 목록 안에서) */
   dateStyle?: 'dot' | 'short';
   showCategory?: boolean;
-  /** true면 요약 없이 날짜와 제목만, 간격도 좁게 (태그 목록처럼 같은 글이 반복되는 곳) */
-  compact?: boolean;
 }
 
-const { posts, dateStyle = 'dot', showCategory = false, compact = false } = Astro.props;
+const { posts, dateStyle = 'dot', showCategory = false } = Astro.props;
 ---
 
-<ul class:list={['post-list', { compact }]}>
+<ul class="post-list">
   {
     posts.map((post) => (
       <li class="post-item">
         <h3 class="title">
           <a href={postHref(post)}>{post.data.title}</a>
         </h3>
-        {!compact && <p class="description">{post.data.description}</p>}
+        <p class="description">{post.data.description}</p>
         <p class="meta">
           <time datetime={isoDate(post.data.date)}>{formatDate(post.data.date, dateStyle)}</time>
           {showCategory && (
@@ -48,10 +46,6 @@ const { posts, dateStyle = 'dot', showCategory = false, compact = false } = Astr
     gap: var(--space-6);
     padding: 0;
     list-style: none;
-  }
-
-  .post-list.compact {
-    gap: var(--space-4);
   }
 
   .post-item {

@@ -156,7 +156,6 @@ const posts = defineCollection({
       ),
       category: z.enum(['daily', 'study'], { error: 'category는 daily 또는 study 중 하나여야 합니다.' }),
       tags: z.preprocess(normalizeTags, z.array(z.string())).default([]),
-      toc: z.boolean().default(true),
       cover: image().optional(),
       coverAlt: z.string().optional(),
       draft: z.boolean().default(false),

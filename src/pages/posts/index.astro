@@ -1,18 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostArchive from '../../components/PostArchive.astro';
+import { SITE } from '../../consts';
 import { getPosts } from '../../lib/posts';
 
 const title = '전체 글';
-const description = '일상과 공부, 지금까지 쓴 모든 글';
 const posts = await getPosts();
 ---
 
-<BaseLayout title={title} description={description} current="posts">
+<BaseLayout title={title} description={`전체 글 ${posts.length}편 — ${SITE.description}`} current="posts">
   <div class="container narrow">
     <header class="page-header">
       <h1>{title}</h1>
-      <p>{description}</p>
     </header>
     <PostArchive posts={posts} />
   </div>

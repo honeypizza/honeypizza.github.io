@@ -1,18 +1,18 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostArchive from '../../components/PostArchive.astro';
+import { SITE } from '../../consts';
 import { CATEGORIES, getPosts } from '../../lib/posts';
 
-const { label: title, description } = CATEGORIES.daily;
+const { label: title } = CATEGORIES.daily;
 const posts = await getPosts('daily');
 ---
 
-<BaseLayout title={title} description={description} current="daily">
+<BaseLayout title={title} description={`${title} 글 ${posts.length}편 — ${SITE.description}`} current="daily">
   <div class="container narrow">
     <header class="page-header">
       <h1>{title}</h1>
-      <p>{description}</p>
     </header>
-    <PostArchive posts={posts} active="daily" />
+    <PostArchive posts={posts} category="daily" />
   </div>
 </BaseLayout>

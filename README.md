@@ -1,6 +1,6 @@
 # haein’s blog
 
-일상과 공부 이야기를 천천히 적는 개인 블로그 **haein’s blog**의 소스 코드예요. (저장소: `honeypizza.github.io`)
+개인 블로그 **haein’s blog**의 소스 코드예요. (저장소: `honeypizza.github.io`)
 [Astro](https://astro.build)로 테마 없이 직접 만든 정적 사이트이고, `main` 브랜치에 push하면
 GitHub Actions가 <https://honeypizza.github.io>에 자동으로 배포해요.
 
@@ -30,7 +30,7 @@ GitHub Actions가 <https://honeypizza.github.io>에 자동으로 배포해요.
 | `/` | 홈. 짧은 소개와 최근 공부 글·최근 일상 글 |
 | `/posts/` | 전체 글 (연도별 목록) |
 | `/posts/daily/`, `/posts/study/` | 일상 글, 공부 글만 모아 보기 |
-| `/posts/<slug>/` | 글 하나. 소제목이 2개 이상이면 번호가 붙은 목차가 함께 보여요 |
+| `/posts/<slug>/` | 글 하나 |
 | `/tags/`, `/tags/<태그>/` | 태그 목록, 태그별 글 |
 | `/about/` | 소개 (학력, 경력, 기술, 수상 등) |
 | `/rss.xml` | RSS 피드 (화면에 링크는 없어요. RSS 앱에 블로그 주소를 넣으면 자동으로 찾아요) |
@@ -96,7 +96,7 @@ npm run dev     # 미리보기 서버 시작
 │   ├── data/profile.ts            소개 페이지와 홈 상단의 내용
 │   ├── consts.ts                  사이트 이름·설명·상단 메뉴
 │   ├── content.config.ts          글 정보(frontmatter) 규칙
-│   ├── components/                화면 조각 (헤더, 목차, 글 목록 등)
+│   ├── components/                화면 조각 (헤더, 글 목록 등)
 │   │   └── mdx/                   글 안에서 쓰는 Figure, Gallery, Video, YouTube, Quote, Callout
 │   ├── layouts/                   페이지 뼈대 (BaseLayout, PostLayout)
 │   ├── lib/                       글 목록·날짜·태그 처리, Markdown 플러그인
@@ -139,7 +139,6 @@ description: "올겨울 첫눈이 내린 아침, 동네 풍경 몇 장."
 date: 2026-11-28
 category: daily
 tags: [겨울, 사진]
-toc: false                   # 목차 숨기기 (짧은 글에 어울려요)
 # cover: ./cover.jpg         # 대표 사진을 글 폴더에 넣었을 때만 맨 앞의 #을 지워요
 # coverAlt: "눈이 얇게 쌓인 동네 골목길"
 ---
@@ -167,7 +166,6 @@ draft: true                      # 다 쓰면 이 줄을 지워요
 | `date` | 필수 | 작성일 `2026-11-28`, 시간까지 `2026-11-28 21:30` |
 | `category` | 필수 | `daily` 또는 `study` |
 | `tags` | 선택 | `[태그1, 태그2]` 또는 `태그1, 태그2` (`#`은 붙이지 않아요) |
-| `toc` | 선택 | `false`면 목차 숨김. 목차는 `##` 소제목이 2개 이상일 때 보여요 |
 | `cover`, `coverAlt` | 선택 | 대표 이미지(`./cover.jpg`처럼 `./`로 시작)와 그 설명 |
 | `draft` | 선택 | `true`면 미리보기에서만 보이고 배포되지 않음 (기본 `false`) |
 
@@ -185,10 +183,10 @@ draft: true                      # 다 쓰면 이 줄을 지워요
 | 항목 | 쓰이는 곳 | 설명 |
 | --- | --- | --- |
 | `isSample` | 소개 페이지 위 안내 | `true`면 "예시입니다" 안내가 보여요. 내용을 다 바꾼 뒤 `false`로 바꿔요 |
-| `name` | 홈 프로필 카드, 소개 페이지 제목, 사이트 하단 | 이름 |
-| `tagline` | 홈 프로필 카드, 소개 페이지 이름 아래 | 한 줄 소개 |
-| `photo` | 홈 프로필 카드, 소개 페이지 | 프로필 사진 (선택, 아래 참고). 없으면 홈 카드에는 사이트 아이콘이 들어가요 |
-| `links` | 홈 프로필 카드, 소개 페이지 연락처 | `label`(항목 이름), `href`(주소), `text`(소개 페이지에 보일 글자, 선택). 홈 카드에는 `label`이 보여요. `label: 'GitHub'` 항목은 사이트 하단 링크에도 쓰이니 이름을 바꾸지 않아요 |
+| `name` | 홈 상단 프로필, 소개 페이지 제목, 사이트 하단 | 이름 |
+| `tagline` | 홈 상단 프로필, 소개 페이지 이름 아래 | 한 줄 소개 |
+| `photo` | 홈 상단 프로필, 소개 페이지 | 프로필 사진 (선택, 아래 참고). 없으면 홈에는 사진 자리 없이 이름부터 보여요 |
+| `links` | 홈 상단 프로필, 소개 페이지 연락처 | `label`(항목 이름), `href`(주소), `text`(소개 페이지에 보일 글자, 선택). 홈에는 `label`이 보여요. `label: 'GitHub'` 항목은 사이트 하단 링크에도 쓰이니 이름을 바꾸지 않아요 |
 | `intro` | 소개 페이지 본문 | 배열의 항목 하나가 문단 하나 |
 | `education`, `experience` | 학력, 경력·활동 | `period`(왼쪽 기간), `title`(학교·회사), `subtitle`(전공·학위·직무), `notes`(세부 내용 목록, 선택) |
 | `skills` | 기술 스택 | `group`(분류 이름), `items`(목록) |
