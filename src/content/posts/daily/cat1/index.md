@@ -9,6 +9,6 @@
   사진 여러 장을 격자로 놓거나(Gallery) 동영상(Video)을 넣으려면 이 파일 이름을 index.mdx로 바꿉니다.
 -->
 
-![alt text](image.png)
+![alt text](image.jpg)
 
 귀염고양이
