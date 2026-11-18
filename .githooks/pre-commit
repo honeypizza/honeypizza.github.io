@@ -1,4 +1,9 @@
 #!/bin/sh
-# 커밋 직전: 이번 커밋에 들어가는 글 폴더의 사진을 줄인다 (큰 PNG → JPG, 큰 JPG 줄이기, 촬영 정보 지우기).
-# (scripts/convert-images.mjs. 변환에 실패해도 커밋은 막지 않는다)
-node scripts/convert-images.mjs --staged || true
+# 커밋 직전: 이번 커밋에 들어가는 글 폴더의 사진을 손본다 (scripts/convert-images.mjs).
+# 큰 사진 줄이기, PNG/JFIF -> JPG, 촬영 정보 지우기. 줄이다 실패한 사진은 그대로 두고 커밋은 막지 않는다.
+# 사이트에서 쓸 수 없는 사진(아이폰 원본 HEIC)이 있을 때만 커밋을 멈춘다.
+node scripts/convert-images.mjs --staged
+if [ $? -eq 2 ]; then
+  exit 1
+fi
+exit 0
