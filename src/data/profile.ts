@@ -69,10 +69,7 @@ export const profile: Profile = {
   tagline: '',
   // photo,
   links: [{ label: 'GitHub', href: 'https://github.com/honeypizza', text: 'https://github.com/honeypizza' }],
-  intro: [
-    '안녕하세요.',
-    '컴퓨터구조',
-  ],
+  intro: ['🏠 😽 💻 👋'],
   education: [
     {
       period: '2026.02 – ',

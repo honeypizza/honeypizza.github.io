@@ -9,8 +9,8 @@
 :root {
   color-scheme: light;
 
-  --color-bg: #f0eee6; /* 아이보리 (이전 값 #faf9f5) */
-  --color-surface: #e8e6dc;
+  --color-bg: #faf9f5; /* Anthropic Ivory Light */
+  --color-surface: #f5f4ed;
   --color-text: #141413;
   --color-text-muted: #5f5d58; /* 이전 값 #6b6963 */
   --color-border: #dedcd1;
@@ -25,11 +25,11 @@
   :root {
     color-scheme: light dark;
 
-    /* 라이트 바탕은 아이보리(종이 느낌). Anthropic 웹사이트 팔레트의 단계를 그대로 쓴다:
-       bg = Ivory Medium(#f0eee6), surface = Ivory Dark(#e8e6dc), 선 = 그 다음 회색 단계(#dedcd1, #c2c0b6).
-       대비: 본문 15.9:1, 보조 글자 5.7:1, 링크 4.5:1. (이전 bg #faf9f5) */
-    --color-bg: light-dark(#f0eee6, #1b1a18);
-    --color-surface: light-dark(#e8e6dc, #23221f); /* code block, inline code */
+    /* 라이트 바탕은 Anthropic 웹사이트 팔레트의 아이보리 단계를 그대로 쓴다:
+       bg = Ivory Light(#faf9f5), surface = 그 다음 단계(#f5f4ed), 선 = 회색 단계(#dedcd1, #c2c0b6).
+       대비: 본문 17.5:1, 보조 글자 6.2:1, 링크 5.0:1. */
+    --color-bg: light-dark(#faf9f5, #1b1a18);
+    --color-surface: light-dark(#f5f4ed, #23221f); /* code block, inline code */
     --color-text: light-dark(#141413, #e9e6de);
     --color-text-muted: light-dark(#5f5d58, #a29f95); /* 라이트 이전 값 #6b6963 */
     --color-border: light-dark(#dedcd1, #34322d); /* 구분선 */
