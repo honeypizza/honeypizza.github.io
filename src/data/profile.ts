@@ -71,11 +71,11 @@ export const profile: Profile = {
   links: [{ label: 'GitHub', href: 'https://github.com/honeypizza', text: 'https://github.com/honeypizza' }],
   intro: [
     '안녕하세요.',
-    '(뭔가추가예정)',
+    '컴퓨터구조',
   ],
   education: [
     {
-      period: '2026.02 – Present',
+      period: '2026.02 – ',
       title: '고려대학교',
       subtitle: 'M.S student in CS',
     },
@@ -89,7 +89,7 @@ export const profile: Profile = {
       title: '동성고등학교',
     },
   ],
-  interests: ['Computer Architecture', 'GPU (Graphics Processing Unit)'],
+  interests: ['Computer Architecture', 'Graphics Processing Unit', ],
   experience: [],
   skills: [],
   awards: [],

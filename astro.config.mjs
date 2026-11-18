@@ -11,6 +11,8 @@ export default defineConfig({
   // 모든 페이지 주소는 /로 끝난다 (/posts/, /about/). GitHub Pages가 내주는 주소와 같고,
   // dev에서 /가 빠진 내부 링크를 바로 404로 알려 준다. (rss.xml 같은 파일 주소는 예외)
   trailingSlash: 'always',
+  // npm run dev 화면 아래에 뜨는 Astro 개발 도구 막대를 끈다. (배포된 사이트에는 원래 나오지 않는다)
+  devToolbar: { enabled: false },
   integrations: [mdx(), sitemap()],
   image: {
     // 본문 이미지에 srcset을 자동으로 만들어 화면 폭에 맞는 크기를 내려준다.

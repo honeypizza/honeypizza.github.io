@@ -9,37 +9,38 @@
 :root {
   color-scheme: light;
 
-  --color-bg: #f7f1e4; /* 은은한 크림색 (이전 값 #faf9f5) */
-  --color-surface: #f0e9d8;
+  --color-bg: #f0eee6; /* 아이보리 (이전 값 #faf9f5) */
+  --color-surface: #e8e6dc;
   --color-text: #141413;
   --color-text-muted: #5f5d58; /* 이전 값 #6b6963 */
-  --color-border: #e2d9c6;
-  --color-border-strong: #cabfa9;
-  --color-accent: #006f94;
-  --color-accent-hover: #005775;
-  --color-accent-soft: #00a9e0;
-  --color-selection: #cdecf8;
+  --color-border: #dedcd1;
+  --color-border-strong: #c2c0b6;
+  --color-accent: #006ccb;
+  --color-accent-hover: #00538f;
+  --color-accent-soft: #4aa8e0;
+  --color-selection: #cfe9fc;
 }
 
 @supports (color: light-dark(#fff, #000)) {
   :root {
     color-scheme: light dark;
 
-    /* 라이트 바탕은 은은한 크림색(종이 느낌). surface·선도 같은 노란 기운으로 맞춘다. (이전 bg #faf9f5) */
-    --color-bg: light-dark(#f7f1e4, #1b1a18);
-    --color-surface: light-dark(#f0e9d8, #23221f); /* code block, inline code */
+    /* 라이트 바탕은 아이보리(종이 느낌). Anthropic 웹사이트 팔레트의 단계를 그대로 쓴다:
+       bg = Ivory Medium(#f0eee6), surface = Ivory Dark(#e8e6dc), 선 = 그 다음 회색 단계(#dedcd1, #c2c0b6).
+       대비: 본문 15.9:1, 보조 글자 5.7:1, 링크 4.5:1. (이전 bg #faf9f5) */
+    --color-bg: light-dark(#f0eee6, #1b1a18);
+    --color-surface: light-dark(#e8e6dc, #23221f); /* code block, inline code */
     --color-text: light-dark(#141413, #e9e6de);
     --color-text-muted: light-dark(#5f5d58, #a29f95); /* 라이트 이전 값 #6b6963 */
-    --color-border: light-dark(#e2d9c6, #34322d); /* 구분선 */
-    --color-border-strong: light-dark(#cabfa9, #4a4740); /* 인용·callout 선, hover 테두리 (장식용) */
-    /* 라이트: Blue Bottle 로고의 파랑(#00a9e0, hsl 195 100% 44%) 계열.
-       로고 색 그대로는 크림 바탕에서 2.4:1이라 글자로 읽기 어렵다 → 글자는 같은 색조를 깊게(hsl 195 100% 29%,
-       bg 5.0:1, surface 4.7:1), 로고 색 그대로는 링크 밑줄 같은 장식(--color-accent-soft)에 쓴다.
-       다크: 하늘색(#4aa8e0) 그대로. */
-    --color-accent: light-dark(#006f94, #4aa8e0); /* 링크, 현재 위치, focus */
-    --color-accent-hover: light-dark(#005775, #7cc0ea);
-    --color-accent-soft: light-dark(#00a9e0, #4aa8e0); /* 글자가 아닌 장식(링크 밑줄 등)에만 */
-    --color-selection: light-dark(#cdecf8, #163447);
+    --color-border: light-dark(#dedcd1, #34322d); /* 구분선 */
+    --color-border-strong: light-dark(#c2c0b6, #4a4740); /* 인용·callout 선, hover 테두리 (장식용) */
+    /* 하늘색(#4aa8e0) 계열. 다크는 하늘색 그대로(어두운 바탕에서 6.6:1).
+       라이트에서는 하늘색 그대로면 2.3:1이라 글자로 읽기 어렵다 → 글자는 같은 색조에서 채도를 끝까지 올리고
+       본문 글자 기준(4.5:1)을 지키는 가장 밝은 단계(hsl 208 100% 40%), 하늘색 그대로는 링크 밑줄(--color-accent-soft)에 쓴다. */
+    --color-accent: light-dark(#006ccb, #4aa8e0); /* 링크, 현재 위치, focus */
+    --color-accent-hover: light-dark(#00538f, #7cc0ea);
+    --color-accent-soft: light-dark(#4aa8e0, #4aa8e0); /* 글자가 아닌 장식(링크 밑줄 등)에만 */
+    --color-selection: light-dark(#cfe9fc, #163447);
   }
 
   :root[data-theme='light'] {

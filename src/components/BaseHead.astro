@@ -35,7 +35,7 @@ if (typeof image === 'string') {
   const width = Math.min(1200, image.width);
   const height = Math.round((image.height * width) / image.width);
   // layout 'none': srcset 없이 파일 하나만. 투명 PNG는 배경색으로 채운다 (jpg는 투명을 검게 만든다).
-  const { src } = await getImage({ src: image, width, format: 'jpg', layout: 'none', background: '#f7f1e4' });
+  const { src } = await getImage({ src: image, width, format: 'jpg', layout: 'none', background: '#f0eee6' });
   og = { url: new URL(src, Astro.site).href, width, height, alt: imageAlt };
 }
 
@@ -80,7 +80,7 @@ const jsonLd = article
 
 <meta name="color-scheme" content="light dark" />
 <!-- colors.css의 --color-bg와 같은 값 -->
-<meta name="theme-color" content="#f7f1e4" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#f0eee6" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#1b1a18" media="(prefers-color-scheme: dark)" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="alternate" type="application/rss+xml" title={SITE.title} href={new URL('rss.xml', Astro.site)} />
