@@ -1,0 +1,13 @@
+{
+  // 글(.md)에 사진을 붙여 넣거나(Ctrl+V) Shift를 누른 채 끌어다 놓으면,
+  // 사진 파일을 그 글과 같은 폴더에 저장하고 본문에 사진 줄(![](사진.jpg))을 넣는다.
+  "markdown.copyFiles.destination": {
+    "**/src/content/posts/**": "${documentDirName}/"
+  },
+
+  // 커밋하면 바로 GitHub로 push한다. push되면 GitHub Actions가 몇 분 안에 사이트에 배포한다.
+  "git.postCommitCommand": "push",
+  // 바뀐 파일을 하나씩 고르지(stage) 않아도, 커밋하면 새 사진·글까지 모두 함께 들어간다.
+  "git.enableSmartCommit": true,
+  "git.smartCommitChanges": "all"
+}

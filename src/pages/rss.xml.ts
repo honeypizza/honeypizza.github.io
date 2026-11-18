@@ -15,7 +15,7 @@ export async function GET(context: APIContext) {
     customData: `<language>${SITE.lang}</language><atom:link href="${self}" rel="self" type="application/rss+xml"/>`,
     items: posts.map((post) => ({
       title: post.data.title,
-      description: post.data.description,
+      description: post.data.description || undefined,
       pubDate: post.data.date,
       link: postHref(post),
       categories: [CATEGORIES[post.data.category].label, ...post.data.tags],

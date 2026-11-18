@@ -19,7 +19,7 @@ const { posts, dateStyle = 'dot', showCategory = false } = Astro.props;
         <h3 class="title">
           <a href={postHref(post)}>{post.data.title}</a>
         </h3>
-        <p class="description">{post.data.description}</p>
+        {post.data.description && <p class="description">{post.data.description}</p>}
         <p class="meta">
           <time datetime={isoDate(post.data.date)}>{formatDate(post.data.date, dateStyle)}</time>
           {showCategory && (

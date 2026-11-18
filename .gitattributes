@@ -1,0 +1,2 @@
+# Git hook은 셸 스크립트라 Windows에서도 줄 끝을 LF로 둔다 (CRLF면 실행되지 않는다).
+.githooks/* text eol=lf

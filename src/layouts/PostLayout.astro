@@ -28,7 +28,7 @@ const showToc = tocHeadings.filter((heading) => heading.depth === 2).length >= 2
 
 <BaseLayout
   title={title}
-  description={description}
+  description={description || undefined}
   image={cover}
   imageAlt={coverAlt}
   current={category}
@@ -39,7 +39,7 @@ const showToc = tocHeadings.filter((heading) => heading.depth === 2).length >= 2
     <div class="container post-grid">
       <header class="post-header">
         <h1>{title}</h1>
-        <p class="lede">{description}</p>
+        {description && <p class="lede">{description}</p>}
       </header>
 
       <aside class="post-side zones__side" aria-label="글 정보">

@@ -1,10 +1,15 @@
 /**
- * 새 글 폴더와 index.mdx를 만든다.
+ * 새 글 폴더와 두 파일을 만든다: 글 정보(info.md)와 본문(index.md 또는 index.mdx).
  *
  *   npm run new -- <daily|study> <slug> "제목"
  *   npm run new -- daily first-snow "첫눈 온 날"
  *
- * → src/content/posts/daily/first-snow/index.mdx (draft: true 상태로 생성)
+ * → src/content/posts/daily/first-snow/info.md   (제목·요약·날짜·분류·태그, draft: true 상태로 생성)
+ *   src/content/posts/daily/first-snow/index.md  (본문만)
+ *
+ * 일상 글은 index.md: 글과 사진 한 장씩이면 충분하고, VS Code에서 사진을 끌어다 놓아 넣을 수 있다.
+ *   (사진 여러 장 격자·동영상이 필요하면 파일 이름을 index.mdx로 바꾼다)
+ * 공부 글은 index.mdx: 강조 박스(Callout), 인용(Quote) 같은 component를 쓴다.
  */
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
@@ -58,6 +63,7 @@ if (RESERVED_SLUGS.includes(slug)) fail(`"${slug}"는 예약된 주소라 slug�
 function findExisting(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.name.startsWith('_') || entry.name.startsWith('.')) continue;
+    if (entry.name.toLowerCase() === 'info.md') continue; // 글 정보 파일 (글이 아니다)
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
       const found = findExisting(path);
@@ -86,43 +92,33 @@ const parts = new Intl.DateTimeFormat('en-US', {
 const part = (type) => parts.find((p) => p.type === type).value;
 const today = `${part('year')}-${part('month')}-${part('day')}`;
 
-const frontmatter = `---
-title: ${JSON.stringify(title)}
-description: "목록에 보일 한 줄 요약을 적어 주세요."
-# date: ${today} # 비워 두면 처음 올린(commit한) 시각이 들어갑니다. 날짜를 정하려면 맨 앞의 #을 지우세요.
+/** 글 정보. 한 줄에 "항목: 값" 하나씩. 비워 둔 값은 사이트가 채운다 (src/content.config.ts). */
+const info = `title: ${JSON.stringify(title)}
+description:     # 목록에 보일 한 줄 요약. 비워 두면 본문 첫 문단이 들어갑니다
+date:            # 비워 두면 처음 올린(commit한) 시각. 직접 정하려면 ${today} 또는 ${today} 21:30
 category: ${category}
-tags: [] # 예: [산책, 사진]
-# cover: ./cover.jpg # 대표 이미지 (공유 미리보기에도 쓰임). 사진을 이 폴더에 넣고 맨 앞의 #을 지우세요.
-# coverAlt: "대표 이미지 설명"
-draft: true # 다 쓰면 false로 바꾸거나 이 줄을 지우세요. true인 동안은 배포되지 않습니다.
----
+tags: []         # 예: [산책, 사진]
+draft: true      # 다 쓰면 이 줄을 지우세요. true인 동안은 사이트에 올라가지 않습니다
 `;
 
+/** 분류별 파일 형식. 일상은 Markdown(.md), 공부는 MDX(.mdx). */
+const extension = { daily: 'md', study: 'mdx' }[category];
+
 const body = {
-  daily: `
-{/*
+  daily: `<!--
   이 주석은 화면에 보이지 않습니다. 다 읽었으면 지워도 됩니다. 자세한 방법은 GUIDE.md를 참고하세요.
+  제목·요약·날짜·태그는 같은 폴더의 info.md에 적습니다. 이 파일에는 글만 씁니다.
 
-  사진 한 장: 사진 파일을 이 폴더에 넣고 아래처럼 씁니다. 따옴표 안은 캡션(생략 가능).
+  사진: Ctrl+V로 붙여 넣거나 Shift를 누른 채 끌어다 놓으면 사진이 이 폴더에 저장되고 아래 같은 줄이 들어갑니다.
     ![사진 설명](./photo.jpg "캡션")
+  큰 PNG 사진은 커밋할 때 JPG로 자동으로 바뀝니다.
 
-  사진 여러 장: 여는 태그 다음과 닫는 태그 앞에 빈 줄을 꼭 둡니다.
-    <Gallery caption="캡션" columns={2}>
-
-    ![첫 번째 사진 설명](./a.jpg)
-    ![두 번째 사진 설명](./b.jpg)
-
-    </Gallery>
-
-  동영상: import 줄은 글 맨 위(--- 바로 아래)에 씁니다.
-    import clip from './clip.mp4';
-    <Video src={clip} caption="캡션" />
-*/}
+  사진 여러 장을 격자로 놓거나(Gallery) 동영상(Video)을 넣으려면 이 파일 이름을 index.mdx로 바꿉니다.
+-->
 
 여기에 글을 씁니다.
 `,
-  study: `
-여기에 도입 문단을 씁니다. 무엇을, 왜 다루는지 두세 문장이면 충분합니다.
+  study: `여기에 도입 문단을 씁니다. 무엇을, 왜 다루는지 두세 문장이면 충분합니다.
 
 ## 첫 번째 소제목
 
@@ -130,6 +126,7 @@ const body = {
 
 {/*
   이 주석은 화면에 보이지 않습니다. 다 읽었으면 지워도 됩니다. 자세한 방법은 GUIDE.md를 참고하세요.
+  제목·요약·날짜·태그는 같은 폴더의 info.md에 적습니다. 이 파일에는 글만 씁니다.
 
   코드:     \`\`\`js 와 \`\`\` 사이에 코드를 씁니다.
   강조 박스: <Callout>참고할 내용</Callout>
@@ -142,9 +139,13 @@ const body = {
 }[category];
 
 mkdirSync(dir, { recursive: true });
-const file = join(dir, 'index.mdx');
-writeFileSync(file, frontmatter + body, { flag: 'wx' });
+const infoFile = join(dir, 'info.md');
+const file = join(dir, `index.${extension}`);
+writeFileSync(infoFile, info, { flag: 'wx' });
+writeFileSync(file, body, { flag: 'wx' });
 
-console.log(`\n  ✓ 새 글을 만들었습니다: ${show(file)}`);
+console.log(`\n  ✓ 새 글을 만들었습니다: ${show(dir)}/`);
+console.log(`    글 정보: ${show(infoFile)}  (제목·요약·날짜·태그)`);
+console.log(`    본문:    ${show(file)}`);
 console.log(`    주소: /posts/${slug}/  (npm run dev 실행 중이면 http://localhost:4321/posts/${slug}/)`);
-console.log('    draft: true 상태라 배포되지 않습니다. 다 쓰면 false로 바꾸세요.\n');
+console.log('    draft: true 상태라 배포되지 않습니다. 다 쓰면 info.md에서 그 줄을 지우세요.\n');
