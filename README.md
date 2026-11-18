@@ -136,7 +136,6 @@ npm run dev     # 미리보기 서버 시작
 ---
 title: "첫눈 온 날"
 description: "올겨울 첫눈이 내린 아침, 동네 풍경 몇 장."
-date: 2026-11-28
 category: daily
 tags: [겨울, 사진]
 # cover: ./cover.jpg         # 대표 사진을 글 폴더에 넣었을 때만 맨 앞의 #을 지워요
@@ -152,7 +151,7 @@ tags: [겨울, 사진]
 ---
 title: "Astro로 RSS 피드 붙이기"
 description: "@astrojs/rss로 블로그에 RSS를 붙이면서 정리한 순서와 주의할 점."
-date: 2026-12-03 21:30           # 시간은 선택 (한국 시간)
+date: 2026-12-03 21:30           # 선택. 적지 않으면 처음 올린(commit한) 시각
 category: study
 tags: [Astro, RSS]
 draft: true                      # 다 쓰면 이 줄을 지워요
@@ -163,7 +162,7 @@ draft: true                      # 다 쓰면 이 줄을 지워요
 | --- | --- | --- |
 | `title` | 필수 | 글 제목 |
 | `description` | 필수 | 한 줄 요약 (목록, 글 상단, 검색·공유 미리보기, RSS) |
-| `date` | 필수 | 작성일 `2026-11-28`, 시간까지 `2026-11-28 21:30` |
+| `date` | 선택 | 작성일. 적지 않으면 그 글을 처음 올린(commit한) 시각. 직접 정하려면 `2026-11-28`, 시간까지 `2026-11-28 21:30` |
 | `category` | 필수 | `daily` 또는 `study` |
 | `tags` | 선택 | `[태그1, 태그2]` 또는 `태그1, 태그2` (`#`은 붙이지 않아요) |
 | `cover`, `coverAlt` | 선택 | 대표 이미지(`./cover.jpg`처럼 `./`로 시작)와 그 설명 |

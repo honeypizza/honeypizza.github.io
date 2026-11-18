@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # git 기록 전체를 받는다. date를 적지 않은 글은 처음 commit된 시각을 작성일로 쓴다 (src/content.config.ts).
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v7

@@ -89,7 +89,7 @@ const today = `${part('year')}-${part('month')}-${part('day')}`;
 const frontmatter = `---
 title: ${JSON.stringify(title)}
 description: "목록에 보일 한 줄 요약을 적어 주세요."
-date: ${today}
+# date: ${today} # 비워 두면 처음 올린(commit한) 시각이 들어갑니다. 날짜를 정하려면 맨 앞의 #을 지우세요.
 category: ${category}
 tags: [] # 예: [산책, 사진]
 # cover: ./cover.jpg # 대표 이미지 (공유 미리보기에도 쓰임). 사진을 이 폴더에 넣고 맨 앞의 #을 지우세요.

@@ -1,8 +1,9 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { glob, type Loader } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { tagSlug } from './lib/tag-slug';
 
@@ -72,6 +73,45 @@ function parsePostDate(value: unknown) {
   return new Date(`${y}-${pad(month)}-${pad(day)}T${pad(h)}:${mi}:${s ?? '00'}${offset}`);
 }
 
+/**
+ * 글 파일이 처음 commit된 시각 (= 처음 올린 때). 이름을 바꾼 파일은 바꾸기 전 기록까지 따라간다.
+ * 아직 commit하지 않았거나 git을 쓸 수 없으면 undefined.
+ * 배포(GitHub Actions)에서는 checkout이 git 기록 전체를 받아야 한다 (deploy.yml의 fetch-depth: 0).
+ */
+function firstCommitDate(filePath: string): Date | undefined {
+  try {
+    const log = execFileSync('git', ['log', '--follow', '--diff-filter=A', '--format=%aI', '--', filePath], {
+      cwd: dirname(filePath),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const first = log.trim().split(/\r?\n/).at(-1);
+    return first ? new Date(first) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * frontmatter에 date가 없으면 처음 commit된 시각을 넣는다. 아직 commit 전인 글은 지금 시각 (npm run dev 미리보기용).
+ * date를 적은 글은 적은 값을 그대로 쓴다.
+ */
+function withCommitDate(loader: Loader): Loader {
+  return {
+    ...loader,
+    load: (context) =>
+      loader.load({
+        ...context,
+        parseData: ((props) => {
+          const { data, filePath } = props;
+          if (data.date !== undefined && data.date !== null && data.date !== '') return context.parseData(props);
+          const date = (filePath && firstCommitDate(filePath)) || new Date();
+          return context.parseData({ ...props, data: { ...data, date } });
+        }) as typeof context.parseData,
+      }),
+  };
+}
+
 /** npm run new가 넣는 기본 문구. 이 문구가 남은 채로 배포되지 않게 막는다. */
 const PLACEHOLDER_TITLES = ['제목을 적어 주세요', '제목을 입력하세요'];
 const PLACEHOLDER_DESCRIPTION = '목록에 보일 한 줄 요약을 적어 주세요.';
@@ -135,17 +175,19 @@ function normalizeTags(value: unknown) {
 }
 
 const posts = defineCollection({
-  loader: glob({
-    // `_`로 시작하는 파일·폴더는 무시한다 (메모, 임시 파일용).
-    pattern: ['**/*.{md,mdx}', '!**/_*', '!**/_*/**'],
-    base: './src/content/posts',
-    generateId: ({ entry, base, data }) => {
-      const slug = postSlug(entry);
-      claimSlug(slug, entry, base);
-      checkPost(entry, base, data);
-      return slug;
-    },
-  }),
+  loader: withCommitDate(
+    glob({
+      // `_`로 시작하는 파일·폴더는 무시한다 (메모, 임시 파일용).
+      pattern: ['**/*.{md,mdx}', '!**/_*', '!**/_*/**'],
+      base: './src/content/posts',
+      generateId: ({ entry, base, data }) => {
+        const slug = postSlug(entry);
+        claimSlug(slug, entry, base);
+        checkPost(entry, base, data);
+        return slug;
+      },
+    }),
+  ),
   schema: ({ image }) =>
     z.object({
       title: z.string().trim().min(1, { error: 'title(제목)이 비어 있습니다.' }),
