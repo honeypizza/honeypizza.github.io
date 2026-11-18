@@ -1,4 +1,4 @@
 #!/bin/sh
-# 커밋 직전: 이번 커밋에 들어가는 글 폴더의 큰 PNG 사진을 JPG로 바꾸고 글 속 경로도 고친다.
+# 커밋 직전: 이번 커밋에 들어가는 글 폴더의 사진을 줄인다 (큰 PNG → JPG, 큰 JPG 줄이기, 촬영 정보 지우기).
 # (scripts/convert-images.mjs. 변환에 실패해도 커밋은 막지 않는다)
 node scripts/convert-images.mjs --staged || true

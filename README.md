@@ -97,8 +97,11 @@ npm run new -- daily first-snow "첫눈 온 날"     # 공부 글은 study
 - **붙여 넣기**: 카톡 등에서 사진을 복사해 `index.md`에 **Ctrl + V**. 사진이 글 폴더에 저장되고 사진 줄이 들어가요.
 - **파일 끌어다 놓기**: 사진 파일을 **Shift를 누른 채** 본문으로 끌어다 놓아요.
 - 들어간 줄의 `[ ]` 안은 **사진 설명**으로 바꿔 적어요.
-- 붙여 넣은 사진은 PNG로 저장되는데, **300KB 이상이고 투명한 부분이 없는 PNG는 커밋할 때 JPG로 자동으로 바뀌어요.**
-  긴 변은 2400px 이하로 줄고, 글 속 경로도 함께 고쳐져요. 작은 캡처·도표와 투명 배경 PNG는 그대로 둬요.
+- **커밋할 때 사진이 자동으로 줄어요.** GitHub 저장소가 무거워지지 않게 하려는 거예요.
+  - 붙여 넣은 사진(PNG)은 JPG로 바뀌고 글 속 경로도 함께 고쳐져요. 작은 캡처·도표와 투명 배경 PNG는 그대로 둬요.
+  - 1MB가 넘는 휴대폰 원본 JPG는 같은 이름으로 줄여요.
+  - 긴 변은 1600px 이하로 줄고, 사진 속 **촬영 위치(GPS) 같은 정보는 지워져요.**
+- 사진은 저장소에 함께 올라가야 사이트에 보여요(`.gitignore`로 빼면 안 돼요). 한 번 올린 사진은 지워도 Git 기록에 남으니, 줄여서 올리는 게 중요해요.
 - 사이트는 사진을 화면 크기에 맞는 가벼운 형식으로 다시 만들어 보여 줘요. 원본이 커도 방문자에게는 가볍게 보여요.
 - 아이폰 **원본 파일**(`.heic`)은 쓸 수 없어요. JPG로 바꿔서 넣어요(카톡으로 받은 사진은 괜찮아요).
 
@@ -162,21 +165,20 @@ npm run new -- daily first-snow "첫눈 온 날"     # 공부 글은 study
 | 여백, 본문 폭, 넓은 화면 틀 | `src/styles/tokens/layout.css` |
 | 사이트 아이콘, 기본 공유 이미지 | `public/favicon.svg`, `public/og-default.png` (1200×630) |
 
-처음 들어 있는 예시 글 4편(`daily/late-autumn-walk`, `daily/morning-coffee`, `study/building-this-blog`, `study/korean-typography-css`)은
-폴더째 지우면 돼요. 사진 여러 장·동영상·표·코드 예시가 필요하면 지우기 전에 열어 보세요.
+글을 지우려면 글 폴더를 통째로 지우고 커밋해요.
 
 ---
 
 ## 9. 개발 메모
 
 **준비물**: [Node.js](https://nodejs.org) 22.23.4 이상, Git, VS Code. 처음 한 번 `npm install`을 실행해요
-(커밋할 때 PNG를 JPG로 바꾸는 Git hook도 이때 연결돼요).
+(커밋할 때 사진을 줄이는 Git hook도 이때 연결돼요).
 
 | 명령어 | 하는 일 |
 | --- | --- |
 | `npm run new -- <daily\|study> <주소> "제목"` | 글 폴더와 `info.md`(초안), 본문(일상 `index.md`, 공부 `index.mdx`)을 만들어요 |
 | `npm run dev` | 미리보기 서버 <http://localhost:4321>. 초안도 보여요 |
-| `npm run images` | 글 폴더의 큰 PNG를 JPG로 바꿔요(커밋할 때 자동으로 실행돼요) |
+| `npm run images` | 글 폴더의 큰 사진을 줄여요(PNG → JPG, 큰 JPG 줄이기, 촬영 정보 지우기). 커밋할 때 자동으로 실행돼요 |
 | `npm run build` | 배포용 사이트를 `dist/`에 만들어요. 오류를 미리 확인할 때 써요 |
 | `npm run check` | 코드 타입 검사 |
 
@@ -189,7 +191,7 @@ npm run new -- daily first-snow "첫눈 온 날"     # 공부 글은 study
 | --- | --- |
 | `info.md` 읽기, 비워 둔 글 정보 채우기 | `src/content.config.ts`, `src/lib/excerpt.ts` |
 | 붙여 넣은 사진을 글 폴더에 저장, 커밋하면 push | `.vscode/settings.json` |
-| 커밋 직전 PNG → JPG | `.githooks/pre-commit` → `scripts/convert-images.mjs` |
+| 커밋 직전 사진 줄이기 (PNG → JPG, 큰 JPG, 촬영 정보) | `.githooks/pre-commit` → `scripts/convert-images.mjs` |
 
 > Windows에서 `npm.ps1 파일을 로드할 수 없습니다`라는 오류가 나면 PowerShell에서
 > `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`를 한 번 실행하거나, `npm` 대신 `npm.cmd`를 써요.
