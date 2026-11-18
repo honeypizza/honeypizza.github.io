@@ -10,6 +10,7 @@
     "check": "astro check",
     "new": "node scripts/new-post.mjs",
     "images": "node scripts/convert-images.mjs",
+    "size": "node scripts/size-report.mjs",
     "prepare": "node -e \"try{require('child_process').execSync('git config core.hooksPath .githooks',{stdio:'ignore'})}catch{}\"",
     "astro": "astro"
   },
