@@ -1,5 +1,5 @@
 /**
- * 소개(/about) 페이지와 홈 상단, 사이트 아래쪽(footer)에 쓰이는 정보.
+ * 소개(/about) 페이지와 홈 상단에 쓰이는 정보.
  * 이 파일만 고치면 페이지에 반영된다. 자세한 방법은 README.md의 "소개 페이지 수정하기"를 참고.
  *
  * 지금은 모두 예시 데이터다. 실제 내용으로 바꾼 뒤 `isSample`을 false로 바꾸면
@@ -11,7 +11,7 @@ import type { ImageMetadata } from 'astro';
 // import photo from '../assets/profile.jpg';
 
 export interface Link {
-  /** 왼쪽에 작게 보이는 이름. 'GitHub'은 footer 링크에도 쓰이므로 이름을 바꾸지 않는다. */
+  /** 링크 이름. 홈 상단과 소개 페이지에 보인다. */
   label: string;
   /** 링크 주소. 이메일은 mailto:로 시작한다. */
   href: string;

@@ -10,7 +10,6 @@ import '../styles/global.css';
 
 import BaseHead, { type Props as HeadProps } from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
 import { SITE, type NavKey } from '../consts';
 
 export interface Props extends HeadProps {
@@ -33,7 +32,6 @@ const { current, ...head } = Astro.props;
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer />
   </body>
 </html>
 
@@ -55,8 +53,10 @@ const { current, ...head } = Astro.props;
     transform: none;
   }
 
+  /* footer 없이 끝난다. 마지막 내용 아래에 section 간격만큼 여백을 둔다. */
   main {
     flex: 1;
+    padding-bottom: var(--section-gap);
   }
 
   main:focus {
