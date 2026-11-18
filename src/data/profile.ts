@@ -49,10 +49,8 @@ export interface Profile {
   /** true인 동안 소개 페이지에 "예시 데이터" 안내가 보인다. */
   isSample: boolean;
   name: string;
-  /** 이름 아래 한 줄 소개 */
+  /** 이름 아래 한 줄 소개 (홈 프로필 카드, 소개 페이지) */
   tagline: string;
-  /** 홈 상단에 보이는 한두 줄 소개 */
-  shortIntro: string;
   photo?: ImageMetadata;
   links: Link[];
   /** 소개 본문. 배열의 항목 하나가 문단 하나. */
@@ -67,8 +65,6 @@ export const profile: Profile = {
   isSample: true,
   name: '김예시',
   tagline: '[예시] 웹 프론트엔드 개발자 · 기록하는 사람',
-  shortIntro:
-    '화면 뒤의 구조와 화면 앞의 사람을 함께 생각하는 개발자입니다. 만든 것과 배운 것, 그리고 평범한 하루를 이곳에 적습니다.',
   // photo,
   links: [
     { label: '이메일', href: 'mailto:hello@example.com', text: 'hello@example.com' },

@@ -24,22 +24,21 @@
   --text-xl: clamp(1.5rem, 1.39rem + 0.45vw, 1.75rem); /* 24→28 — H2 */
   --text-2xl: clamp(1.75rem, 1.53rem + 0.9vw, 2.25rem); /* 28→36 — 목록 페이지 제목 */
   --text-3xl: clamp(2rem, 1.56rem + 1.8vw, 3rem); /* 32→48 — 글 제목(H1) */
-  --text-statement: clamp(1.5rem, 1.06rem + 1.8vw, 2.5rem); /* 24→40 — 홈 첫 화면의 큰 serif 문장 */
   --text-label: var(--text-xs); /* 12 — 조용한 섹션 라벨·개수 (--tracking-label, tabular-nums와 함께) */
 
   /* Line height */
   --leading-body: 1.8; /* 본문 — 한글은 1.7~1.8 */
   --leading-snug: 1.55; /* 리드, 목록 요약, 캡션처럼 1~3줄짜리 글 */
-  --leading-heading: 1.35; /* H2·H3, 홈 문장 — 한글 제목이 두 줄이 돼도 답답하지 않게 */
+  --leading-heading: 1.35; /* H2·H3 — 한글 제목이 두 줄이 돼도 답답하지 않게 */
   --leading-tight: 1.2; /* H1처럼 큰 제목 */
 
   /* Letter spacing */
-  --tracking-tight: -0.02em; /* 큰 serif 제목(H1, 홈 문장) */
+  --tracking-tight: -0.02em; /* 큰 serif 제목(H1) */
   --tracking-heading: -0.01em; /* H2·H3 */
   --tracking-label: 0.04em; /* 작은 라벨 — 한글이라 살짝만 */
 
   /* Font weight — serif 한글(Noto Serif KR)은 500만 로드한다. serif에는 --weight-medium 이하만 쓴다. */
   --weight-regular: 400; /* 본문 */
   --weight-medium: 500; /* serif 제목, 목록 글 제목, 라벨 */
-  --weight-semibold: 600; /* 강조(strong), H4, 홈 문장 앞의 이름(sans) */
+  --weight-semibold: 600; /* 강조(strong), H4 */
 }

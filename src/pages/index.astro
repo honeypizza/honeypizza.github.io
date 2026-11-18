@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostList from '../components/PostList.astro';
 import { profile } from '../data/profile';
@@ -18,12 +19,40 @@ const sections = await Promise.all(
 <BaseLayout current="home">
   <div class="container">
     <header class="hero">
-      {/* 이름(h1)과 소개(p)를 한 문단처럼 이어서 보여 준다. */}
-      <div class="statement">
-        <h1>{profile.name}</h1>{' '}
-        <p>{profile.shortIntro}</p>
+      {/* 프로필 카드: 사진 | 이름, 한 줄 소개, 링크. 내용은 src/data/profile.ts에서 고친다. */}
+      <div class="profile-card">
+        {
+          profile.photo ? (
+            <Image class="avatar" src={profile.photo} alt={`${profile.name} 프로필 사진`} width={128} height={128} />
+          ) : (
+            /* 사진이 없으면 사이트 아이콘(public/favicon.svg와 같은 모양)을 둔다. */
+            <span class="avatar avatar-mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" width="28" height="28">
+                <path class="ink" d="M4 8H14V18H24V28H4Z" />
+                <rect class="sky" x="18" y="4" width="10" height="10" />
+              </svg>
+            </span>
+          )
+        }
+        <div class="identity">
+          <h1 class="name">{profile.name}</h1>
+          <p class="tagline">{profile.tagline}</p>
+          <ul class="links">
+            {
+              profile.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))
+            }
+            <li>
+              <a class="more" href="/about/">
+                소개 더보기 <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-      <a class="text-link more" href="/about/">소개 더보기 <span aria-hidden="true">→</span></a>
     </header>
 
     <div class="recent">
@@ -54,35 +83,87 @@ const sections = await Promise.all(
 
 <style>
   .hero {
-    padding-block: var(--section-gap);
+    padding-block: var(--space-7) var(--section-gap);
   }
 
-  .statement {
-    max-width: var(--width-wide);
-    font-family: var(--font-serif);
-    font-size: var(--text-statement);
-    font-weight: var(--weight-regular);
-    line-height: var(--leading-heading);
-    letter-spacing: var(--tracking-tight);
+  /* 사진 | 이름·한 줄 소개·링크 */
+  .profile-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    max-width: 36rem;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .avatar {
+    flex-shrink: 0;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .avatar-mark {
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+  }
+
+  .avatar-mark .ink {
+    fill: var(--color-text);
+  }
+
+  .avatar-mark .sky {
+    fill: var(--color-accent);
+  }
+
+  .identity {
+    min-width: 0;
+  }
+
+  .name {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .tagline {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
     color: var(--color-text-muted);
-    text-wrap: balance;
   }
 
-  .statement h1,
-  .statement p {
-    display: inline;
-    font: inherit;
-    letter-spacing: inherit;
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-4);
+    margin-top: var(--space-2);
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
   }
 
-  /* 이름은 같은 serif, 색으로만 구분한다. */
-  .statement h1 {
-    color: var(--color-text);
-  }
-
-  .more {
+  .links a {
     display: inline-block;
-    margin-top: var(--space-6);
+    padding-block: var(--space-1);
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .links .more {
+    font-weight: var(--weight-medium);
+    color: var(--color-accent);
   }
 
   /* 작은 라벨 + 개수 + 1px 선 */
