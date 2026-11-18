@@ -1,0 +1,58 @@
+---
+/**
+ * 글 목록 page(전체 글, 일상, 공부, 태그별)의 공통 뼈대.
+ * - 좁은 화면: 제목 → 태그 한 줄 → 연도별 목록
+ * - 넓은 화면(1152px~): 왼쪽 칸(제목, 글 수, 태그) | 연도별 목록
+ */
+import BaseLayout from './BaseLayout.astro';
+import PostArchive from '../components/PostArchive.astro';
+import TagNav from '../components/TagNav.astro';
+import type { NavKey } from '../consts';
+import { getPosts, groupByTag, type Category, type Post } from '../lib/posts';
+
+export interface Props {
+  /** page 제목 (h1, 브라우저 탭) */
+  title: string;
+  /** 검색·공유 미리보기에 쓰는 설명 */
+  description: string;
+  /** 상단 메뉴에서 현재 위치로 표시할 항목 */
+  current?: NavKey;
+  posts: Post[];
+  /** 한 분류만 모은 page(일상, 공부)면 그 분류. 글마다 붙는 분류 표시를 뺀다. */
+  category?: Category;
+  /** 태그 page면 그 태그의 주소 이름. 태그 목록에서 강조된다. */
+  currentTag?: string;
+}
+
+const { title, description, current, posts, category, currentTag } = Astro.props;
+const allPosts = await getPosts();
+const tags = groupByTag(allPosts);
+---
+
+<BaseLayout title={title} description={description} current={current}>
+  <div class="container zones">
+    <div class="zones__side">
+      <header class="page-header">
+        <h1>{title}</h1>
+        <p class="page-count">{posts.length}편</p>
+      </header>
+      <TagNav tags={tags} total={allPosts.length} current={currentTag} />
+    </div>
+    <div class="zones__main">
+      <PostArchive posts={posts} category={category} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .page-count {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

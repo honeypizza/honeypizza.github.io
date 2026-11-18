@@ -32,6 +32,8 @@ const { current, ...head } = Astro.props;
     <main id="main" tabindex="-1">
       <slot />
     </main>
+    {/* 페이지 끝 표시: 얇은 가로선 + 그 아래 여백 (예전 footer 자리) */}
+    <div class="container site-end" aria-hidden="true"></div>
   </body>
 </html>
 
@@ -53,10 +55,25 @@ const { current, ...head } = Astro.props;
     transform: none;
   }
 
-  /* footer 없이 끝난다. 마지막 내용 아래에 section 간격만큼 여백을 둔다. */
+  /* 마지막 내용 → (section 간격) → 끝 선 → (같은 간격) → page 끝.
+     main을 화면 높이만큼 늘리지 않으므로, 글이 짧은 page에서도 선이 화면 맨 아래로 밀려 내용과 멀어지지 않는다. */
   main {
-    flex: 1;
     padding-bottom: var(--section-gap);
+  }
+
+  /* 내용 폭(기준 단)에만 긋는 1px 선. 그 아래 여백은 위 여백과 같다. */
+  .site-end {
+    position: relative;
+    flex-shrink: 0;
+    height: var(--section-gap);
+  }
+
+  .site-end::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    inset-inline: var(--gutter);
+    border-top: 1px solid var(--color-border);
   }
 
   main:focus {

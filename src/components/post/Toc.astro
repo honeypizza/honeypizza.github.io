@@ -1,0 +1,123 @@
+---
+/**
+ * 글 목차. 넓은 화면(1152px~)에서 글 page 왼쪽 칸에만 보인다 (좁은 화면에서는 본문만).
+ * 지금 읽고 있는 소제목을 강조한다.
+ */
+import type { MarkdownHeading } from 'astro';
+
+export interface Props {
+  /** 본문 소제목 (H2, H3) */
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+---
+
+<nav class="toc" aria-labelledby="toc-label">
+  <p class="label" id="toc-label">목차</p>
+  <ol>
+    {
+      headings.map((heading) => (
+        <li class:list={['item', { sub: heading.depth > 2 }]}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .toc {
+    display: none;
+  }
+
+  @media (min-width: 1152px) {
+    .toc {
+      display: block;
+      margin-top: var(--space-6);
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--color-border);
+    }
+  }
+
+  /* 홈·목록의 section label과 같은 작고 조용한 글씨 */
+  .label {
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  ol {
+    margin-top: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .item + .item {
+    margin-top: var(--space-1);
+  }
+
+  a {
+    display: block;
+    padding-block: var(--space-1);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    text-wrap: pretty;
+  }
+
+  /* H3는 H2 아래에 한 단계 들여 쓴다 */
+  .sub a {
+    padding-left: var(--space-4);
+  }
+
+  a:hover {
+    color: var(--color-accent);
+  }
+
+  /* 지금 읽고 있는 소제목 */
+  a[aria-current] {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+</style>
+
+<script>
+  // 화면 위쪽 1/4 선을 지난 마지막 소제목을 "지금 읽는 곳"으로 본다.
+  const links = new Map<string, HTMLAnchorElement>();
+  document.querySelectorAll<HTMLAnchorElement>('.toc a').forEach((a) => links.set(decodeURIComponent(a.hash.slice(1)), a));
+  const headings = [...document.querySelectorAll<HTMLElement>('.prose :is(h2, h3)[id]')].filter((h) => links.has(h.id));
+
+  let current: HTMLAnchorElement | undefined;
+  let queued = false;
+
+  function update() {
+    queued = false;
+    const line = window.innerHeight / 4;
+    let active: HTMLElement | undefined;
+    for (const heading of headings) {
+      if (heading.getBoundingClientRect().top > line) break;
+      active = heading;
+    }
+    const link = active && links.get(active.id);
+    if (link === current) return;
+    current?.removeAttribute('aria-current');
+    link?.setAttribute('aria-current', 'location');
+    current = link;
+  }
+
+  if (headings.length > 0) {
+    const schedule = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    update();
+  }
+</script>

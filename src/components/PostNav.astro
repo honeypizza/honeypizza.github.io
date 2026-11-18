@@ -37,7 +37,7 @@ const label = category ? `이전 글과 다음 글 (${CATEGORIES[category].label
 }
 
 <style>
-  /* 위에 1px 선 하나 (아래는 footer 선이 닫는다). 좁은 화면에서는 위아래로 쌓고, 넓으면 좌우로 나눈다. */
+  /* 위에 1px 선 하나 (아래는 page 끝 선이 닫는다). 좁은 화면에서는 위아래로 쌓고, 640px부터 좌우로 나눈다. */
   .post-nav {
     display: grid;
     grid-template-columns: minmax(0, 1fr);

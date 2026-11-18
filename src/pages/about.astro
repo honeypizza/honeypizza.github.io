@@ -3,17 +3,18 @@ import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { profile } from '../data/profile';
 
-const { name, tagline, photo, links, intro, education, experience, skills, awards, isSample } = profile;
+const { name, tagline, photo, links, intro, interests, education, experience, skills, awards, isSample } = profile;
 
 const timelines = [
-  { id: 'education', title: '학력', items: education },
-  { id: 'experience', title: '경력 · 활동', items: experience },
+  { id: 'education', title: 'Education', items: education },
+  { id: 'experience', title: 'Experience', items: experience },
 ];
 ---
 
 <BaseLayout title="소개" description={`${name} — ${tagline}`} current="about">
-  <div class="container narrow about">
-    <header class="profile">
+  {/* 좁은 화면: 이름·연락처 → 소개 글 → 이력. 넓은 화면(1152px~): 왼쪽 칸(이름·연락처) | 소개 글과 이력 */}
+  <div class="container zones about">
+    <header class="profile zones__side">
       <div class="identity">
         <div>
           <h1>{name}</h1>
@@ -37,90 +38,104 @@ const timelines = [
       }
     </header>
 
-    {
-      isSample && (
-        <p class="sample-notice" role="note">
-          지금 이 페이지의 내용은 모두 예시입니다. <code>src/data/profile.ts</code>를 고치고 <code>isSample</code>을{' '}
-          <code>false</code>로 바꾸면 이 안내가 사라집니다.
-        </p>
-      )
-    }
+    <div class="zones__main">
+      {
+        isSample && (
+          <p class="sample-notice" role="note">
+            지금 이 페이지의 내용은 모두 예시입니다. <code>src/data/profile.ts</code>를 고치고 <code>isSample</code>을{' '}
+            <code>false</code>로 바꾸면 이 안내가 사라집니다.
+          </p>
+        )
+      }
 
-    <div class="intro">
-      {intro.map((paragraph) => <p>{paragraph}</p>)}
+      <div class="intro">
+        {intro.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+
+      {
+        timelines.map(
+          (section) =>
+            section.items.length > 0 && (
+              <section class="resume-section" aria-labelledby={section.id}>
+                <h2 id={section.id}>{section.title}</h2>
+                <ol class="rows">
+                  {section.items.map((item) => (
+                    <li class="row">
+                      <p class="key">{item.period}</p>
+                      <div>
+                        <p class="item-title">{item.title}</p>
+                        {item.subtitle && <p class="item-subtitle">{item.subtitle}</p>}
+                        {item.notes && item.notes.length > 0 && (
+                          <ul class="notes">
+                            {item.notes.map((note) => (
+                              <li>{note}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ),
+        )
+      }
+
+      {
+        interests.length > 0 && (
+          <section class="resume-section" aria-labelledby="interests">
+            <h2 id="interests">Interests</h2>
+            <ul class="rows">
+              {interests.map((interest) => (
+                <li class="row row--single">{interest}</li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        skills.length > 0 && (
+          <section class="resume-section" aria-labelledby="skills">
+            <h2 id="skills">Skills</h2>
+            <ul class="rows">
+              {skills.map((group) => (
+                <li class="row">
+                  <p class="key">{group.group}</p>
+                  <p>{group.items.join(', ')}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        awards.length > 0 && (
+          <section class="resume-section" aria-labelledby="awards">
+            <h2 id="awards">Awards &amp; Certifications</h2>
+            <ol class="rows">
+              {awards.map((award) => (
+                <li class="row">
+                  <p class="key">{award.date}</p>
+                  <div>
+                    <p class="item-title">{award.title}</p>
+                    {award.issuer && <p class="item-subtitle">{award.issuer}</p>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      }
     </div>
-
-    {
-      timelines.map(
-        (section) =>
-          section.items.length > 0 && (
-            <section class="resume-section" aria-labelledby={section.id}>
-              <h2 id={section.id}>{section.title}</h2>
-              <ol class="rows">
-                {section.items.map((item) => (
-                  <li class="row">
-                    <p class="key">{item.period}</p>
-                    <div>
-                      <p class="item-title">{item.title}</p>
-                      {item.subtitle && <p class="item-subtitle">{item.subtitle}</p>}
-                      {item.notes && item.notes.length > 0 && (
-                        <ul class="notes">
-                          {item.notes.map((note) => (
-                            <li>{note}</li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ),
-      )
-    }
-
-    {
-      skills.length > 0 && (
-        <section class="resume-section" aria-labelledby="skills">
-          <h2 id="skills">기술 스택</h2>
-          <ul class="rows">
-            {skills.map((group) => (
-              <li class="row">
-                <p class="key">{group.group}</p>
-                <p>{group.items.join(', ')}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    {
-      awards.length > 0 && (
-        <section class="resume-section" aria-labelledby="awards">
-          <h2 id="awards">수상 · 자격</h2>
-          <ol class="rows">
-            {awards.map((award) => (
-              <li class="row">
-                <p class="key">{award.date}</p>
-                <div>
-                  <p class="item-title">{award.title}</p>
-                  {award.issuer && <p class="item-subtitle">{award.issuer}</p>}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )
-    }
   </div>
 </BaseLayout>
 
 <style>
   .about {
-    /* 왼쪽 열(기간·항목 이름) 너비 — 연락처와 이력 표가 같은 선에 맞춰진다. */
+    /* 이력 표 왼쪽 열(기간·항목 이름) 너비 — 연락처와 이력 표가 같은 선에 맞춰진다. */
     --key-width: 10rem;
-    padding-top: var(--section-gap);
   }
 
   .identity {
@@ -137,9 +152,10 @@ const timelines = [
     letter-spacing: var(--tracking-tight);
   }
 
+  /* 홈 상단의 한 줄 소개와 같은 크기·간격 */
   .tagline {
-    margin-top: var(--space-3);
-    font-size: var(--text-md);
+    margin-top: var(--space-2);
+    font-size: var(--text-base);
     line-height: var(--leading-snug);
     color: var(--color-text-muted);
   }
@@ -165,13 +181,11 @@ const timelines = [
     font-variant-numeric: tabular-nums;
   }
 
+  /* 연락처도 이력 표와 같은 규칙: 좁은 화면은 위아래, 넓은 화면은 왼쪽 열 | 오른쪽 열.
+     (좁은 화면에서만 다른 열 폭을 쓰면 어느 선에도 맞지 않는 세 번째 세로선이 생긴다) */
   .contact {
     margin-top: var(--space-6);
     font-size: var(--text-sm);
-  }
-
-  .contact .row {
-    grid-template-columns: 5.5rem minmax(0, 1fr);
   }
 
   .contact a {
@@ -187,7 +201,7 @@ const timelines = [
   }
 
   .sample-notice {
-    margin-top: var(--space-6);
+    margin-bottom: var(--space-6);
     padding-left: var(--space-5);
     border-left: 1px solid var(--color-border-strong);
     font-size: var(--text-sm);
@@ -198,10 +212,6 @@ const timelines = [
     font-family: var(--font-mono);
     font-size: 0.9em;
     color: var(--color-text);
-  }
-
-  .intro {
-    margin-top: var(--space-7);
   }
 
   .intro p + p {
@@ -233,11 +243,23 @@ const timelines = [
     border-bottom: 1px solid var(--color-border);
   }
 
+  /* Interests: 짧은 단어 목록이라 학력 표보다 한 단계 작고 촘촘하게.
+     들여쓰기는 학교 이름과 같은 세로선에 맞춘다 (좁은 화면은 왼쪽 끝, 넓은 화면은 오른쪽 열 시작). */
+  .rows .row--single {
+    padding-block: var(--space-3);
+    font-size: 0.9375rem; /* 15 — 학교 이름(17)과 보조 글씨(14) 사이 */
+    line-height: var(--leading-snug);
+  }
+
   .item-title {
     font-weight: var(--weight-semibold);
   }
 
+  /* 학교·회사 이름 아래 한 줄(전공, 직무)은 왼쪽 기간과 같은 작은 보조 글씨 */
   .item-subtitle {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
     color: var(--color-text-muted);
   }
 
@@ -257,7 +279,8 @@ const timelines = [
     color: var(--color-text-muted);
   }
 
-  @media (min-width: 560px) {
+  /* 640px: 사이트 공통 경계 (이전·다음 글이 좌우로 나뉘고, 글 상단 태그가 같은 줄에 붙는 폭) */
+  @media (min-width: 640px) {
     .photo {
       width: 7.5rem;
       height: 7.5rem;
@@ -267,6 +290,19 @@ const timelines = [
     .contact .row {
       grid-template-columns: var(--key-width) minmax(0, 1fr);
       align-items: baseline;
+    }
+
+    /* Interests처럼 왼쪽 열이 없는 줄: 글자는 오른쪽 열(학교 이름) 시작선에 둔다 */
+    .rows .row--single {
+      grid-template-columns: minmax(0, 1fr);
+      padding-left: calc(var(--key-width) + var(--space-5));
+    }
+  }
+
+  /* 넓은 화면: 이름·연락처가 왼쪽 칸(288px)으로 가므로 연락처는 다시 위아래로 쌓는다 */
+  @media (min-width: 1152px) {
+    .contact .row {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

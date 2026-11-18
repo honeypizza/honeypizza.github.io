@@ -1,9 +1,11 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import { Image } from 'astro:assets';
 import BaseLayout from './BaseLayout.astro';
 import CategoryLabel from '../components/CategoryLabel.astro';
 import PostNav from '../components/PostNav.astro';
 import CodeBlocks from '../components/post/CodeBlocks.astro';
+import Toc from '../components/post/Toc.astro';
 import { CATEGORIES, formatDate, isoDate, readingMinutes, tagHref, type Post } from '../lib/posts';
 import '../styles/prose.css';
 import '../styles/content-blocks.css';
@@ -12,12 +14,16 @@ export interface Props {
   post: Post;
   prev?: Post;
   next?: Post;
+  /** 본문 소제목. H2가 2개 이상이면 넓은 화면에서 목차를 보여 준다. */
+  headings?: MarkdownHeading[];
 }
 
-const { post, prev, next } = Astro.props;
+const { post, prev, next, headings = [] } = Astro.props;
 const { title, description, date, category, tags, cover, coverAlt, draft } = post.data;
 
 const minutes = readingMinutes(post.body);
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const showToc = tocHeadings.filter((heading) => heading.depth === 2).length >= 2;
 ---
 
 <BaseLayout
@@ -29,16 +35,20 @@ const minutes = readingMinutes(post.body);
   article={{ publishedTime: date, tags, section: CATEGORIES[category].label }}
 >
   <article class="post">
+    {/* 좁은 화면: 제목 → 글 정보 → 대표 사진 → 본문. 넓은 화면(1152px~): 왼쪽 칸(글 정보, 목차) | 제목·본문 */}
     <div class="container post-grid">
       <header class="post-header">
         <h1>{title}</h1>
         <p class="lede">{description}</p>
+      </header>
+
+      <aside class="post-side zones__side" aria-label="글 정보">
         <div class="meta">
           <span class="meta-main">
             <CategoryLabel category={category} link />
-            <span aria-hidden="true">·</span>
+            <span class="sep" aria-hidden="true">·</span>
             <time datetime={isoDate(date)}>{formatDate(date)}</time>
-            <span aria-hidden="true">·</span>
+            <span class="sep" aria-hidden="true">·</span>
             <span>{minutes}분 분량</span>
             {draft && <span class="draft">초안 (배포되지 않음)</span>}
           </span>
@@ -54,7 +64,8 @@ const minutes = readingMinutes(post.body);
             )
           }
         </div>
-      </header>
+        {showToc && <Toc headings={tocHeadings} />}
+      </aside>
 
       {
         cover && (
@@ -84,18 +95,16 @@ const minutes = readingMinutes(post.body);
 </BaseLayout>
 
 <style>
-  /* 본문 column 하나를 화면 가운데에 둔다. */
   .post-grid {
     display: grid;
-    grid-template-columns: minmax(0, var(--width-prose));
-    grid-template-areas: 'header' 'cover' 'body' 'end';
-    justify-content: center;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'header' 'side' 'cover' 'body' 'end';
+    padding-top: var(--section-gap);
   }
 
+  /* 제목은 다른 page의 제목과 같은 자리(본문 왼쪽 끝)에서 시작한다. */
   .post-header {
     grid-area: header;
-    padding-block: var(--section-gap) var(--space-8);
-    text-align: center;
   }
 
   h1 {
@@ -105,26 +114,28 @@ const minutes = readingMinutes(post.body);
   }
 
   .lede {
-    max-width: 36rem;
-    margin: var(--space-5) auto 0;
+    margin-top: var(--space-5);
     font-size: var(--text-md);
     line-height: var(--leading-snug);
     color: var(--color-text-muted);
-    text-wrap: balance;
   }
 
+  .post-side {
+    grid-area: side;
+    margin-block: var(--space-5) var(--space-7);
+  }
+
+  /* 좁은 화면: 분류 · 날짜 · 분량 · #태그를 한 줄로 (넘치면 태그가 다음 줄로) */
   .meta,
   .meta-main,
   .tags {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     align-items: baseline;
     gap: var(--space-1) var(--space-2);
   }
 
   .meta {
-    margin-top: var(--space-5);
     font-size: var(--text-sm);
     line-height: var(--leading-snug);
     color: var(--color-text-muted);
@@ -136,7 +147,7 @@ const minutes = readingMinutes(post.body);
     list-style: none;
   }
 
-  /* 태그 묶음 앞의 가운뎃점. 좁은 화면에서는 태그가 다음 줄로 내려가므로 뺀다. */
+  /* 태그 묶음 앞의 가운뎃점. 태그가 다음 줄로 내려가는 좁은 화면에서는 뺀다. */
   .tags::before {
     content: '·';
     content: '·' / '';
@@ -146,6 +157,13 @@ const minutes = readingMinutes(post.body);
   .meta :global(a) {
     display: inline-block;
     padding-block: 0.125rem;
+  }
+
+  @media (pointer: coarse) {
+    .meta :global(a) {
+      padding-block: 0.5rem;
+      margin-block: -0.375rem;
+    }
   }
 
   .tags a {
@@ -163,6 +181,7 @@ const minutes = readingMinutes(post.body);
     color: var(--color-text);
   }
 
+  /* 대표 사진은 늘 본문 폭을 꽉 채운다. 화면 높이가 낮으면(가로로 든 휴대폰) 위아래만 잘라 한 화면 안에 둔다. */
   .post-cover {
     grid-area: cover;
     margin-bottom: var(--space-7);
@@ -170,12 +189,16 @@ const minutes = readingMinutes(post.body);
 
   .post-cover :global(img) {
     width: 100%;
+    max-height: var(--media-max-height);
     border-radius: var(--radius);
+    object-fit: cover;
   }
 
+  /* 본문 사진·동영상이 본문 폭을 기준으로 크기를 정한다 (content-blocks.css의 cqw) */
   .post-body {
     grid-area: body;
     min-width: 0;
+    container-type: inline-size;
   }
 
   .post-end {
@@ -183,13 +206,56 @@ const minutes = readingMinutes(post.body);
     min-width: 0;
   }
 
-  @media (max-width: 599.98px) {
+  @media (max-width: 639.98px) {
     .tags {
       flex-basis: 100%;
     }
 
     .tags::before {
       display: none;
+    }
+  }
+
+  /* 넓은 화면: 왼쪽 칸에 글 정보를 한 줄에 하나씩, 그 아래 목차. 칸은 글을 읽는 동안 따라 내려온다. */
+  @media (min-width: 1152px) {
+    .post-grid {
+      grid-template-columns: var(--width-side) minmax(0, var(--width-prose));
+      grid-template-areas:
+        'side header'
+        'side cover'
+        'side body'
+        'side end';
+      grid-template-rows: auto auto auto 1fr;
+      column-gap: var(--zone-gap);
+    }
+
+    .post-header {
+      margin-bottom: var(--space-7);
+    }
+
+    .post-side {
+      align-self: start;
+      margin-block: -0.375rem;
+    }
+
+    .meta,
+    .meta-main {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+
+    .meta {
+      gap: var(--space-3);
+    }
+
+    .sep,
+    .tags::before {
+      display: none;
+    }
+
+    .tags {
+      column-gap: var(--space-3);
     }
   }
 </style>

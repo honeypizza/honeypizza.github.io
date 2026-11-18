@@ -14,10 +14,38 @@
   --space-8: 4rem; /* 64 */
   --space-9: 6rem; /* 96 */
 
-  /* Layout */
-  --width-prose: 700px;
-  --width-page: 1120px;
-  --gutter: clamp(1rem, 4vw, 2rem);
-  --section-gap: clamp(var(--space-8), 8vw, var(--space-9));
+  /* Layout — header, 모든 page의 내용, 끝 선이 같은 틀(--width-page) 하나를 쓴다.
+     틀이 둘이면(예전 header 1120 / 본문 700) 창을 넓힐수록 logo와 본문 왼쪽 끝이 0→210px 벌어진다.
+     - 좁은 화면: 틀 = 본문 폭(700). 위에서 아래로 한 줄.
+     - 넓은 화면(1152px~, 아래 @media): 틀 = 왼쪽 칸(288) + 간격(64) + 본문(700) = 1052.
+       목록·소개·글은 왼쪽 칸에 제목·태그·목차 같은 정보를, 오른쪽에 본문을 둔다. 홈은 두 열.
+     두 경우 모두 logo = 내용 왼쪽 끝, 메뉴·버튼 끝 = 내용 오른쪽 끝. 바뀌는 곳은 1152px 한 곳뿐이다. */
+  --width-prose: 700px; /* 본문 한 줄의 최대 폭 (한글 약 40자) */
+  --width-side: 18rem; /* 288 — 넓은 화면의 왼쪽 정보 칸 */
+  --zone-gap: var(--space-8); /* 64 — 왼쪽 칸과 본문 사이 */
+  --width-frame: calc(var(--width-side) + var(--zone-gap) + var(--width-prose));
+  --width-page: var(--width-prose);
+
+  /* 화면 폭에 따라 커지는 값은 모두 같은 구간(360px → 800px)에서 함께 커진다.
+     800px은 본문 단(700 + 여백)이 화면을 다 채우지 않게 되는 폭이라, 그보다 넓은 창에서는 크기가 변하지 않고
+     틀이 가운데에 머문다(1152px에서 한 번 넓은 틀로 바뀔 뿐). 비율이 서로 다른 구간에서 변하면 창을 늘릴 때마다
+     균형이 달라 보인다. (typography.css의 글자 크기, prose.css의 소제목 위 여백도 같은 구간) */
+  --gutter: clamp(1rem, 0.182rem + 3.636vw, 2rem); /* 16 → 32 */
+
+  /* page 위(header → 제목)·아래(마지막 내용 → 끝 선 → page 끝) 여백. 64 → 96.
+     높이가 낮은 화면(가로로 든 휴대폰, 낮은 창)에서는 화면 높이의 12%까지만 (최소 48). */
+  --section-gap: clamp(var(--space-7), min(2.364rem + 7.273vw, 12svh), var(--space-9));
+
+  /* 사진·동영상·대표 이미지가 한 화면 안에 들어오도록 하는 최대 높이 */
+  --media-max-height: min(80svh, 50rem);
+
   --radius: 6px;
+}
+
+/* 넓은 화면: 틀을 왼쪽 칸 + 본문 폭으로 넓힌다. 1152 = 틀 1052 + 양쪽 여백 64 + Windows 스크롤바 자리 30 남짓.
+   CSS 변수는 @media 조건에 쓸 수 없어서, 같은 경계를 쓰는 곳(global.css의 .zones, 각 page)에 1152px을 그대로 적는다. */
+@media (min-width: 1152px) {
+  :root {
+    --width-page: var(--width-frame);
+  }
 }

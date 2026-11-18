@@ -23,10 +23,9 @@
 }
 
 /* 사진 한 장(링크가 걸린 사진 포함)은 단 폭을 꽉 채운다.
-   세로로 긴 사진은 화면 높이를 넘지 않게 줄여 가운데에 둔다. */
+   세로로 긴 사진은 화면 높이(--media-max-height, layout.css)를 넘지 않게 줄여 가운데에 둔다. */
 .prose :where(figure > img, figure > a > img, p > img:only-child, p > a:only-child > img:only-child) {
-  --photo-max-height: min(80svh, 50rem);
-  max-height: var(--photo-max-height);
+  max-height: var(--media-max-height);
   margin-inline: auto;
   object-fit: contain;
 }
@@ -39,13 +38,18 @@
 }
 
 /* attr()로 사진 비율을 읽을 수 있는 browser에서는 높이를 줄인 세로 사진도 상자가 사진 크기와 같아져
-   모서리와 캡션이 사진에 맞는다. 원본보다 크게 늘리지도 않는다. 나머지 browser는 위 규칙대로. */
+   모서리와 캡션이 사진에 맞는다. 원본보다 크게 늘리지도 않는다. 나머지 browser는 위 규칙대로.
+   화면 높이에 맞춘 폭(--fit-width)이 본문 폭(100cqw, PostLayout의 .post-body)의 85% 이상이면 본문 폭을 꽉 채운다.
+   창 높이가 조금 낮을 때 사진이 본문보다 몇 px만 좁아지면 정렬 실수처럼 보이기 때문이다.
+   (clamp 식: --fit-width가 85cqw보다 작으면 0, 크면 본문 폭까지 남은 만큼 더한다) */
 @supports (width: calc(attr(width type(<number>), 0) * 1px)) {
   .prose :where(figure > img, figure > a > img, p > img:only-child, p > a:only-child > img:only-child):where([width][height]) {
+    --fit-width: calc(var(--media-max-height) * attr(width type(<number>)) / attr(height type(<number>)));
     width: min(
       attr(width type(<number>)) * 1px,
-      var(--photo-max-height) * attr(width type(<number>)) / attr(height type(<number>))
+      var(--fit-width) + clamp(0px, (var(--fit-width) - 85cqw) * 1000, max(0px, 100cqw - var(--fit-width)))
     );
+    max-height: none;
   }
 
   .prose > figure:has(> img[width][height], > a > img[width][height]) {
@@ -180,6 +184,23 @@
   /* 언어 표시가 없으면 위쪽 자리를 비워 둘 필요가 없다. */
   .code-block:not(:has(.code-block__lang)) pre {
     padding-top: 1.25rem;
+  }
+}
+
+/* 좁은 화면(본문 단이 화면을 다 채우는 폭): 표처럼 화면 끝까지 넓혀 코드 한 줄을 32px 더 보여 준다.
+   좌우 테두리와 둥근 모서리는 빼고, 안쪽 여백을 화면 여백과 같게 해서 코드 글자가 본문 글줄과 같은 선에서 시작한다. */
+@media (max-width: 759.98px) {
+  .prose > :is(pre, .code-block) {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+
+  .prose :is(pre, .code-block) {
+    --code-pad: var(--gutter);
+  }
+
+  .prose pre {
+    border-inline: 0;
+    border-radius: 0;
   }
 }
 

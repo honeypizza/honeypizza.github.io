@@ -28,7 +28,7 @@ GitHub Actions가 <https://honeypizza.github.io>에 자동으로 배포해요.
 | 주소 | 내용 |
 | --- | --- |
 | `/` | 홈. 짧은 소개와 최근 공부 글·최근 일상 글 |
-| `/posts/` | 전체 글 (연도별 목록) |
+| `/posts/` | 전체 글 (연도별 목록). 넓은 화면에서는 왼쪽 칸의 태그를 눌러 그 태그 글만 볼 수 있어요 |
 | `/posts/daily/`, `/posts/study/` | 일상 글, 공부 글만 모아 보기 |
 | `/posts/<slug>/` | 글 하나 |
 | `/tags/`, `/tags/<태그>/` | 태그 목록, 태그별 글 |
@@ -98,7 +98,7 @@ npm run dev     # 미리보기 서버 시작
 │   ├── content.config.ts          글 정보(frontmatter) 규칙
 │   ├── components/                화면 조각 (헤더, 글 목록 등)
 │   │   └── mdx/                   글 안에서 쓰는 Figure, Gallery, Video, YouTube, Quote, Callout
-│   ├── layouts/                   페이지 뼈대 (BaseLayout, PostLayout)
+│   ├── layouts/                   페이지 뼈대 (BaseLayout, PostLayout, 목록 page의 ListLayout)
 │   ├── lib/                       글 목록·날짜·태그 처리, Markdown 플러그인
 │   ├── pages/                     주소별 페이지 (/, /posts/, /about/, /tags/, rss.xml 등)
 │   └── styles/                    CSS. tokens/ 안에 색·글꼴·간격 값
@@ -226,7 +226,7 @@ education: [
 | 사이트 주소 | `astro.config.mjs`의 `site` |
 | 색 (라이트·다크 모드) | `src/styles/tokens/colors.css`. `light-dark(라이트 색, 다크 색)` 한 쌍으로 적어요 |
 | 글꼴, 글자 크기, 줄 간격 | `src/styles/tokens/typography.css` |
-| 여백, 본문 폭 | `src/styles/tokens/layout.css` (`--width-prose`가 본문 폭) |
+| 여백, 본문 폭, 넓은 화면 틀 | `src/styles/tokens/layout.css` (`--width-prose`가 본문 폭, `--width-side`가 넓은 화면의 왼쪽 칸 폭) |
 | 본문 글자 모양 | `src/styles/prose.css` |
 | 사진·코드 블록·표·각주 모양 | `src/styles/content-blocks.css` |
 | 사이트 아이콘 | `public/favicon.svg` |

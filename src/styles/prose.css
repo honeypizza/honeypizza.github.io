@@ -19,12 +19,13 @@
   margin-top: var(--space-5);
 }
 
+/* 화면 폭 360 → 800px 사이에서 커진다 (글자 크기와 같은 구간) */
 .prose > h2 {
-  margin-top: clamp(var(--space-7), 2.25rem + 3vw, 4.5rem); /* 48 → 72 */
+  margin-top: clamp(var(--space-7), 1.773rem + 5.455vw, 4.5rem); /* 48 → 72 */
 }
 
 .prose > h3 {
-  margin-top: clamp(2.25rem, 1.8rem + 1.8vw, var(--space-7)); /* 36 → 48 */
+  margin-top: clamp(2.25rem, 1.636rem + 2.727vw, var(--space-7)); /* 36 → 48 */
 }
 
 .prose > :is(h4, h5, h6) {

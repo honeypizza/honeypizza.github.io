@@ -21,10 +21,12 @@
 
 <style>
   .theme-toggle {
+    /* 손가락으로 누르는 화면에서는 44px. header가 이 값으로 아이콘 위치를 본문 끝에 맞춘다. */
+    --toggle-size: 2.5rem;
     display: inline-grid;
     place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--toggle-size);
+    height: var(--toggle-size);
     padding: 0;
     color: var(--color-text-muted);
     background: transparent;
@@ -35,6 +37,12 @@
 
   .theme-toggle:hover {
     color: var(--color-accent);
+  }
+
+  @media (pointer: coarse) {
+    .theme-toggle {
+      --toggle-size: 2.75rem;
+    }
   }
 
   /* light-dark() 미지원 browser는 색이 light로 고정되므로 toggle을 숨긴다. */

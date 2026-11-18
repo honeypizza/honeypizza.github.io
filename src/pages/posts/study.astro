@@ -1,6 +1,5 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostArchive from '../../components/PostArchive.astro';
+import ListLayout from '../../layouts/ListLayout.astro';
 import { SITE } from '../../consts';
 import { CATEGORIES, getPosts } from '../../lib/posts';
 
@@ -8,11 +7,10 @@ const { label: title } = CATEGORIES.study;
 const posts = await getPosts('study');
 ---
 
-<BaseLayout title={title} description={`${title} 글 ${posts.length}편 — ${SITE.description}`} current="study">
-  <div class="container narrow">
-    <header class="page-header">
-      <h1>{title}</h1>
-    </header>
-    <PostArchive posts={posts} category="study" />
-  </div>
-</BaseLayout>
+<ListLayout
+  title={title}
+  description={`${title} 글 ${posts.length}편 — ${SITE.description}`}
+  current="study"
+  posts={posts}
+  category="study"
+/>

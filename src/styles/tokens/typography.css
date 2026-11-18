@@ -15,15 +15,18 @@
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'JetBrains Mono', 'D2Coding', 'Noto Sans Mono CJK KR',
     'Apple SD Gothic Neo', 'Malgun Gothic', monospace;
 
-  /* Type scale — 큰 크기는 화면 폭 390px→1280px 사이에서 부드럽게 커진다 (주석: 390 → 1280 기준 px) */
+  /* Type scale — 큰 크기는 화면 폭 360px→800px 사이에서 부드럽게 커지고, 그보다 넓으면 그대로다.
+     (본문 단이 더 넓어지지 않는데 제목만 커지면 줄 수가 바뀌어 아래 내용이 통째로 밀린다. layout.css 참고)
+     주석: 360 → 800 기준 px */
   --text-xs: 0.75rem; /* 12 — 라벨, 개수, 코드 언어 표시 */
   --text-sm: 0.875rem; /* 14 — 메타(날짜·분량), 캡션, 각주 */
   --text-base: 1.0625rem; /* 17 — 본문 (모바일도 같음) */
   --text-md: 1.1875rem; /* 19 — 리드(요약문), 인용문 */
-  --text-lg: clamp(1.25rem, 1.2rem + 0.22vw, 1.375rem); /* 20→22 — H3 */
-  --text-xl: clamp(1.5rem, 1.39rem + 0.45vw, 1.75rem); /* 24→28 — H2 */
-  --text-2xl: clamp(1.75rem, 1.53rem + 0.9vw, 2.25rem); /* 28→36 — 목록 페이지 제목 */
-  --text-3xl: clamp(2rem, 1.56rem + 1.8vw, 3rem); /* 32→48 — 글 제목(H1) */
+  --text-lg: clamp(1.25rem, 1.148rem + 0.455vw, 1.375rem); /* 20→22 — H3 */
+  --text-xl: clamp(1.5rem, 1.295rem + 0.909vw, 1.75rem); /* 24→28 — H2 */
+  --text-2xl: clamp(1.75rem, 1.341rem + 1.818vw, 2.25rem); /* 28→36 — 목록 페이지 제목 */
+  /* 32→48 — 글 제목(H1). 높이가 낮은 화면(가로로 든 휴대폰)에서는 화면 높이의 9%까지만 */
+  --text-3xl: clamp(2rem, min(1.182rem + 3.636vw, 9svh), 3rem);
   --text-label: var(--text-xs); /* 12 — 조용한 섹션 라벨·개수 (--tracking-label, tabular-nums와 함께) */
 
   /* Line height */

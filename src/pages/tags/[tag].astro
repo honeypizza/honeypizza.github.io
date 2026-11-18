@@ -1,7 +1,6 @@
 ---
 import type { InferGetStaticPropsType } from 'astro';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostArchive from '../../components/PostArchive.astro';
+import ListLayout from '../../layouts/ListLayout.astro';
 import { SITE } from '../../consts';
 import { getPosts, groupByTag } from '../../lib/posts';
 
@@ -16,17 +15,11 @@ const { tag } = Astro.props;
 const title = `#${tag.label}`;
 ---
 
-<BaseLayout title={title} description={`${title} 태그가 붙은 글 ${tag.posts.length}편 — ${SITE.description}`}>
-  <div class="container narrow">
-    <header class="page-header">
-      <h1>{title}</h1>
-    </header>
-    <PostArchive posts={tag.posts} />
-  </div>
-</BaseLayout>
-
-<style>
-  .page-header h1 {
-    overflow-wrap: anywhere;
-  }
-</style>
+{/* 태그 page는 "전체 글"을 태그로 거른 목록이라 상단 메뉴에서도 전체 글 아래에 있는 것으로 표시한다. */}
+<ListLayout
+  title={title}
+  description={`${title} 태그가 붙은 글 ${tag.posts.length}편 — ${SITE.description}`}
+  current="posts"
+  posts={tag.posts}
+  currentTag={tag.slug}
+/>
