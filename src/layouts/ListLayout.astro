@@ -18,15 +18,18 @@ export interface Props {
   /** 상단 메뉴에서 현재 위치로 표시할 항목 */
   current?: NavKey;
   posts: Post[];
-  /** 한 분류만 모은 page(일상, 공부)면 그 분류. 글마다 붙는 분류 표시를 뺀다. */
+  /**
+   * 한 분류만 모은 page(일상, 공부, 그 안의 태그 page)면 그 분류.
+   * 글마다 붙는 분류 표시를 빼고, 태그 목록에는 그 분류 글에 붙은 태그만 보여 준다.
+   */
   category?: Category;
   /** 태그 page면 그 태그의 주소 이름. 태그 목록에서 강조된다. */
   currentTag?: string;
 }
 
 const { title, description, current, posts, category, currentTag } = Astro.props;
-const allPosts = await getPosts();
-const tags = groupByTag(allPosts);
+const scopePosts = await getPosts(category);
+const tags = groupByTag(scopePosts);
 ---
 
 <BaseLayout title={title} description={description} current={current}>
@@ -36,7 +39,7 @@ const tags = groupByTag(allPosts);
         <h1>{title}</h1>
         <p class="page-count">{posts.length}편</p>
       </header>
-      <TagNav tags={tags} total={allPosts.length} current={currentTag} />
+      <TagNav tags={tags} total={scopePosts.length} current={currentTag} category={category} />
     </div>
     <div class="zones__main">
       <PostArchive posts={posts} category={category} />

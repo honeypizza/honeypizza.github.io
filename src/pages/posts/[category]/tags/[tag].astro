@@ -1,0 +1,38 @@
+---
+/**
+ * 일상·공부 안의 태그 page (/posts/daily/tags/<태그>/, /posts/study/tags/<태그>/).
+ * 그 분류 글 중 이 태그가 붙은 글만 모은다. 전체 글의 태그 page는 /tags/<태그>/.
+ */
+import type { InferGetStaticPropsType } from 'astro';
+import ListLayout from '../../../../layouts/ListLayout.astro';
+import { SITE } from '../../../../consts';
+import { CATEGORIES, getPosts, groupByTag, type Category } from '../../../../lib/posts';
+
+export async function getStaticPaths() {
+  const categories = Object.keys(CATEGORIES) as Category[];
+  const paths = await Promise.all(
+    categories.map(async (category) =>
+      groupByTag(await getPosts(category)).map((tag) => ({
+        params: { category, tag: tag.slug },
+        props: { category, tag },
+      })),
+    ),
+  );
+  return paths.flat();
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { category, tag } = Astro.props;
+const title = `#${tag.label}`;
+---
+
+{/* 상단 메뉴에서는 그 분류(일상·공부) 아래에 있는 것으로 표시한다. */}
+<ListLayout
+  title={title}
+  description={`${CATEGORIES[category].label} 글 중 ${title} 태그가 붙은 글 ${tag.posts.length}편 — ${SITE.description}`}
+  current={category}
+  posts={tag.posts}
+  category={category}
+  currentTag={tag.slug}
+/>
