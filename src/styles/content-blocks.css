@@ -93,7 +93,8 @@
   --code-pad: clamp(var(--space-4), 4vw, var(--space-5));
 }
 
-/* 위쪽 여백은 언어 표시·복사 버튼 자리. script가 돌기 전부터 잡아 둬서 화면이 밀리지 않는다. */
+/* 사진처럼 어느 화면 폭에서도 본문 폭을 넘지 않는다. 긴 줄은 상자 안에서 옆으로 밀어서 본다.
+   위쪽 여백은 언어 표시·복사 버튼 자리. script가 돌기 전부터 잡아 둬서 화면이 밀리지 않는다. */
 .prose pre {
   padding: 2.5rem var(--code-pad) 1.25rem;
   border: 1px solid var(--color-border);
@@ -189,44 +190,15 @@
   }
 }
 
-/* 좁은 화면(본문 단이 화면을 다 채우는 폭): 표처럼 화면 끝까지 넓혀 코드 한 줄을 32px 더 보여 준다.
-   좌우 테두리와 둥근 모서리는 빼고, 안쪽 여백을 화면 여백과 같게 해서 코드 글자가 본문 글줄과 같은 선에서 시작한다. */
-@media (max-width: 759.98px) {
-  .prose > :is(pre, .code-block) {
-    margin-inline: calc(var(--gutter) * -1);
-  }
-
-  .prose :is(pre, .code-block) {
-    --code-pad: var(--gutter);
-  }
-
-  .prose pre {
-    border-inline: 0;
-    border-radius: 0;
-  }
-}
-
 /* ==========================================================================
    Table — 가로선만, 좁은 화면에서는 .table-wrap 안에서 가로 scroll
    ========================================================================== */
 
+/* 사진·code block처럼 어느 화면 폭에서도 본문 폭을 넘지 않는다. 넓은 표는 본문 폭 안에서 옆으로 밀어서 본다. */
 .table-wrap {
   overflow-x: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-strong) transparent;
-}
-
-/* 좁은 화면: scroll 영역을 화면 끝까지 넓혀, 넘친 열이 화면 가장자리에서 잘려 보이게(= 옆으로 밀 수 있다는 신호).
-   표 자체는 안쪽 여백만큼 들어가 본문 글줄과 맞는다. */
-@media (max-width: 759.98px) {
-  .prose > .table-wrap {
-    margin-inline: calc(var(--gutter) * -1);
-    padding-inline: var(--gutter);
-  }
-
-  .prose > .table-wrap:focus-visible {
-    outline-offset: -2px;
-  }
 }
 
 .table-wrap table {
