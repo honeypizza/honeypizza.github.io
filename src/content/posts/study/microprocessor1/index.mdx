@@ -78,3 +78,30 @@ void matmul(float* xout, float* x, float* w, int n, int d) {
     }
 }
 ```
+
+이게 c 코드에서 해당 함수인데 parameter 부터 보면
+- xout : 결과를 저장할 곳 (d)
+- x : 입력 vector (n)
+- w : weigth matrix (d x n)
+- n : 입력 길이 = 행렬의 row 갯수
+- d : 출력 길이 = 행렬의 column 갯수
+이다. 
+
+그러니까 matrix(d x n) x vector(n) = output vector xout(d) 인 것이다.
+이렇게 보편적인 matrix vector 곱을 하는 함수를 GEMV(GEneral Matrix Vector multiplciation) 이라고 한다.
+
+이 GEMV 함수를 호출하는 곳과 그 특징은 다음과 같다.
+| 호출 | 결과 ← 입력 | n (입력) | d (출력) | layer당 |
+|---|---|---|---|---|
+| `matmul(s->q, s->xb, wq…, dim, dim)` | q ← xb | 288 | 288 | 1 |
+| `matmul(s->k, s->xb, wk…, dim, kv_dim)` | k ← xb | 288 | 288 | 1 |
+| `matmul(s->v, s->xb, wv…, dim, kv_dim)` | v ← xb | 288 | 288 | 1 |
+| `matmul(s->xb2, s->xb, wo…, dim, dim)` | xb2 ← xb | 288 | 288 | 1 |
+| `matmul(s->hb, s->xb, w1…, dim, hidden_dim)` | hb ← xb | 288 | 768 | 1 |
+| `matmul(s->hb2, s->xb, w3…, dim, hidden_dim)` | hb2 ← xb | 288 | 768 | 1 |
+| `matmul(s->xb, s->hb, w2…, hidden_dim, dim)` | xb ← hb | 768 | 288 | 1 |
+| `matmul(s->logits, x, w->wcls, dim, vocab)` | logits ← x | 288 | 32000 | 마지막 1번 |
+
+참고로 마지막 classifier는 layer마다 도는 것이 아니라 마지막 한 번만 도는 것임에도 불구하고 아까전에 결과를 보면 전체 시간의 58%를 잡아먹는다.
+
+아무튼 이 GEMV를 빠르게 돌릴 hardware를 PL section에 만들어볼 것이다. 이거는 다음 시간에~
