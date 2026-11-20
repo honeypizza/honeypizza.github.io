@@ -1,0 +1,47 @@
+
+마이크로프로세서 수업에서 하는 term project인 LLM 을 zynq ultrascale 96의 ARM processor를 baseline으로 PL section을 이용해 가속하는 내용이에요.
+
+### Zynq Ultra96 
+Avnet이 개발한 소형 개발 보드로 ARM CPU와 FPGA가 하나의 칩에 들어간 Xilinx Zynq Ultrascale+ 를 탑재한 소형보드이다.
+
+가격은 검색해보니 50만원(헉!). 수업을 진행하시는 교수님이 실험실별로 하나씩 나눠줬다.
+
+사진은 이렇다. 
+![alt text](image.png "Ultra96 V2")
+
+
+### llama2.c
+우리가 가속하는 대상이다. 카파시라고 엄청 유명한 사람의 깃허브에 올라와있다. 작은 llama2 inference 과정을 c코드로 CPU에서 그대로 돌릴 수 있다.
+아래가 링크.
+https://github.com/karpathy/llama2.c
+
+
+### baseline
+SD 카드를 통해서 github에 있는 파일들을 몽땅 올리고 몇가지 무척 복잡한 과정을 하면 돌아가서 token을 생성하는 것을 직접 볼 수 있다.
+
+교수님의 pdf 파일과 claude의 도움을 받아가면서 뚝딱뚝딱 겨우겨우 해냈다.
+
+![alt text](O0-15M-vanilla.png "야호~!")
+
+근데 막상 보면 제일 아래에 초당 1.7 토큰을 생성한다는 것을 볼 수 있다. 실제로 위에 문장들이 토큰을 만들어내는 과정에서 출력한 것인데, 진짜 복장 터지게 느리다.
+
+심지어 이건 stories15M이라는 1500만개의 파라미터로 구성된 모델이고, stories42M이라는 4200만개의 파라미터로 구성된 모델은 초당 0.6 토큰으로 뭔가 단단히 잘못된 것을 알 수 있다.
+
+그래서 이걸 zynq ultra scale의 PL section에 가속기를 만들어서 토큰 생성 속도를 빠르게 만드는 것이 프로젝트의 목표다.
+
+
+### profiling
+어떤 시스템을 빠르게 만들기로 결심했으면, 그 시스템의 <u>어디</u>를 빠르게 만들지 결정하는 것이 중요하다.
+
+예를 들어, 총 100초(작업 A 10초 + 작업 B 90초)가 걸리는 시스템에서는,
+10초짜리 작업을 10배 개선해 1초로 줄이는 것(총 91초)보다 
+90초짜리 작업을 10배 개선해 9초로 줄이는 것(총 19초)이 훨씬 중요하다.
+
+그렇기 때문에 토큰 한개를 만들 때 연산별로 걸리는 시간이 얼마인지를 측정하고자했다. 일단 c 코드를 보았을 때 쓰는 연산은 다음과 같다.
+- matrix multiplication
+- attention
+- rmsnorm
+- RoPE, SwiGLU, residual
+- sample
+- embedding copy
+- decode + print

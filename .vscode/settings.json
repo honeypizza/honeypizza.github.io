@@ -4,6 +4,10 @@
   "markdown.copyFiles.destination": {
     "**/src/content/posts/**": "${documentDirName}/"
   },
+  // .mdx도 Markdown으로 열어서, 위의 사진 붙여 넣기·끌어다 놓기와 글자 색 구분이 .mdx 글에서도 되게 한다.
+  "files.associations": {
+    "*.mdx": "markdown"
+  },
 
   // 커밋하면 바로 GitHub로 push한다. push되면 GitHub Actions가 몇 분 안에 사이트에 배포한다.
   "git.postCommitCommand": "push",
