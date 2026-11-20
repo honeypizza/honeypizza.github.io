@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
-import { imageCaptions, wrapTables } from './src/lib/markdown-plugins.mjs';
+import { imageCaptions, softBreaks, splitImageLines, wrapTables } from './src/lib/markdown-plugins.mjs';
 
 export default defineConfig({
   // User site(honeypizza.github.io)라서 base 경로는 두지 않는다.
@@ -30,7 +30,9 @@ export default defineConfig({
           },
         },
       },
-      hastPlugins: [imageCaptions, wrapTables],
+      // splitImageLines가 사진 줄을 떼어 낸 다음에 softBreaks(Enter 한 번 = 줄바꿈)와
+      // imageCaptions(캡션)가 실행된다 (순서 중요).
+      hastPlugins: [splitImageLines, softBreaks, imageCaptions, wrapTables],
     }),
     shikiConfig: {
       // --color-surface 위에서 글자 대비가 충분한 조합 (주석 포함 약 4.5:1 이상).

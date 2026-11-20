@@ -34,6 +34,150 @@ function galleryColumns(node, ctx) {
   return undefined;
 }
 
+/** 사진 한 장(또는 링크가 걸린 사진 한 장)인가 */
+function isImageNode(node) {
+  return isElement(node, 'img') || (isElement(node, 'a') && hasOnlyChild(node, 'img'));
+}
+
+/**
+ * 한 줄에 사진만 있으면, 위아래에 빈 줄 없이 글과 붙어 있어도 사진을 따로 떼어 낸다.
+ * VS Code에서 글 바로 다음 줄에 사진을 붙여 넣으면 Markdown은 둘을 한 문단으로 읽어서
+ * 사진이 글자 사이에 끼인 그림이 되고 크기 제한·가운데 정렬·캡션이 모두 빠진다.
+ *
+ *   사진은 이렇다                    <p>사진은 이렇다</p>
+ *   ![보드](./board.jpg "캡션")  →  <p><img …></p>   (다음 plugin이 <figure>로 바꾼다)
+ *
+ * 문장 가운데에 들어간 사진(같은 줄에 글이 있는 사진)은 그대로 둔다. <Gallery> 안은 건드리지 않는다.
+ *
+ * @type {import('satteri').HastPluginDefinition}
+ */
+export const splitImageLines = {
+  name: 'split-image-lines',
+  element: {
+    filter: ['p'],
+    visit(node, ctx) {
+      const children = node.children ?? [];
+      if (!children.some(isImageNode) || galleryColumns(node, ctx)) return;
+
+      // 줄 단위로 나눈다. 줄바꿈은 text 속 "\n"과 <br>(강제 줄바꿈)이다.
+      const lines = [[]];
+      for (const child of children) {
+        if (child.type === 'text') {
+          child.value.split('\n').forEach((part, i) => {
+            if (i > 0) lines.push([]);
+            if (part) lines.at(-1).push({ type: 'text', value: part });
+          });
+        } else {
+          lines.at(-1).push(child);
+          if (isElement(child, 'br')) lines.push([]);
+        }
+      }
+
+      const meaningful = (line) => line.filter((n) => !isElement(n, 'br') && !(n.type === 'text' && !n.value.trim()));
+      const isImageLine = (line) => {
+        const nodes = meaningful(line);
+        return nodes.length === 1 && isImageNode(nodes[0]);
+      };
+      const filled = lines.filter((line) => meaningful(line).length > 0);
+      // 사진 줄이 없거나 이미 사진만 있는 문단이면 그대로 둔다.
+      if (!filled.some(isImageLine) || filled.length === 1) return;
+
+      // 사진 줄은 한 장씩 문단으로, 나머지 줄은 이어진 것끼리 원래 줄바꿈을 살려 한 문단으로.
+      const paragraphs = [];
+      let textLines = [];
+      const flush = () => {
+        if (!textLines.length) return;
+        const merged = textLines.flatMap((line, i) => (i > 0 && !isElement(textLines[i - 1].at(-1), 'br') ? [{ type: 'text', value: '\n' }, ...line] : line));
+        // 사진 바로 앞 줄 끝의 강제 줄바꿈(<br>)은 문단이 끝나므로 필요 없다.
+        if (isElement(merged.at(-1), 'br')) merged.pop();
+        paragraphs.push({ type: 'element', tagName: 'p', properties: {}, children: merged });
+        textLines = [];
+      };
+      for (const line of filled) {
+        if (isImageLine(line)) {
+          flush();
+          paragraphs.push({ type: 'element', tagName: 'p', properties: {}, children: meaningful(line) });
+        } else {
+          textLines.push(line);
+        }
+      }
+      flush();
+      ctx.replaceNode(node, paragraphs);
+    },
+  },
+};
+
+/** 글자와 같은 줄에 놓이는(문장 안에 들어가는) 요소. 이것들 사이의 줄바꿈만 <br>로 바꾼다. 사진은 뺀다. */
+const INLINE_TAGS = new Set([
+  'a', 'abbr', 'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'del', 'dfn', 'em', 'i', 'ins', 'kbd',
+  'mark', 'q', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'u', 'var',
+]);
+
+/** 이 안의 줄바꿈은 그대로 둔다 (코드는 줄바꿈이 원래 보인다). */
+const KEEP_NEWLINES_IN = new Set(['pre', 'code', 'script', 'style', 'textarea', 'svg', 'math']);
+
+function isInline(node) {
+  if (!node) return false;
+  if (node.type === 'text') return node.value.trim() !== '';
+  if (node.type === 'mdxJsxTextElement' || node.type === 'mdxTextExpression') return true;
+  return node.type === 'element' && INLINE_TAGS.has(node.tagName);
+}
+
+/** 공백뿐인 text를 건너뛴 가장 가까운 형제 */
+function nearestSibling(siblings, index, step) {
+  for (let i = index + step; i >= 0 && i < siblings.length; i += step) {
+    const sibling = siblings[i];
+    if (!(sibling.type === 'text' && !sibling.value.trim())) return sibling;
+  }
+  return undefined;
+}
+
+/**
+ * Enter 한 번(문단 안의 줄바꿈)을 사이트에서도 줄바꿈(<br>)으로 보여 준다.
+ * Markdown 기본 규칙은 Enter 한 번을 띄어쓰기로 이어 붙이지만, 이 블로그는 쓴 그대로 줄이 바뀌게 한다.
+ *
+ *   첫째 줄          <p>첫째 줄<br>
+ *   둘째 줄    →     둘째 줄</p>
+ *
+ * 줄 앞뒤가 모두 글자(굵게·링크 등 포함)일 때만 바꾼다. 그래서 문단·목록·컴포넌트 사이의 줄바꿈,
+ * 줄 끝 `\`(이미 <br>), 코드, <Gallery> 안 사진 사이는 그대로다.
+ * splitImageLines 다음에 실행되어, 사진 줄은 이미 따로 떨어져 있다.
+ *
+ * @type {import('satteri').HastPluginDefinition}
+ */
+export const softBreaks = {
+  name: 'soft-breaks',
+  text(node, ctx) {
+    if (!node.value.includes('\n')) return;
+    const parent = ctx.parent(node);
+    const index = ctx.indexOf(node);
+    if (!parent || index === undefined) return;
+
+    for (let p = parent; p; p = ctx.parent(p)) {
+      if (p.type === 'element' && KEEP_NEWLINES_IN.has(p.tagName)) return;
+      if (p.type?.startsWith('mdxJsx') && p.name === 'Gallery') return;
+    }
+
+    const siblings = parent.children ?? [];
+    const parts = node.value.split('\n');
+    const out = [];
+    let changed = false;
+    parts.forEach((part, i) => {
+      if (i > 0) {
+        const before = parts.slice(0, i).join('\n').trim() ? { type: 'text', value: 'x' } : nearestSibling(siblings, index, -1);
+        const after = parts.slice(i).join('\n').trim() ? { type: 'text', value: 'x' } : nearestSibling(siblings, index, 1);
+        if (isInline(before) && isInline(after)) {
+          out.push({ type: 'element', tagName: 'br', properties: {}, children: [] });
+          changed = true;
+        }
+        out.push({ type: 'text', value: '\n' });
+      }
+      if (part) out.push({ type: 'text', value: part });
+    });
+    if (changed) ctx.replaceNode(node, out);
+  },
+};
+
 /**
  * 본문 이미지 처리.
  *

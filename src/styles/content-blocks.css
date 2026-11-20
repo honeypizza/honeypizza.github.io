@@ -6,11 +6,7 @@
    :where()로 우선순위를 낮춰 prose.css의 "heading 바로 뒤", "첫 요소" 규칙이 이기게 둔다.
    ========================================================================== */
 
-.prose > :where(figure, p:has(> img:only-child), p:has(> a:only-child > img:only-child)) {
-  margin-block: var(--space-7);
-}
-
-.prose > :where(pre, .code-block, .table-wrap, .callout) {
+.prose > :where(figure, p:has(> img:only-child), p:has(> a:only-child > img:only-child), pre, .code-block, .table-wrap, .callout) {
   margin-block: var(--space-6);
 }
 
@@ -22,10 +18,10 @@
   border-radius: var(--radius);
 }
 
-/* 사진 한 장(링크가 걸린 사진 포함)은 단 폭을 꽉 채운다.
-   세로로 긴 사진은 화면 높이(--media-max-height, layout.css)를 넘지 않게 줄여 가운데에 둔다. */
+/* 사진 한 장(링크가 걸린 사진 포함)은 가운데에 둔다.
+   아래 @supports를 지원하지 않는 browser에서는 높이만 제한한다(정사각형 사진 기준 크기 --media-size). */
 .prose :where(figure > img, figure > a > img, p > img:only-child, p > a:only-child > img:only-child) {
-  max-height: var(--media-max-height);
+  max-height: min(var(--media-max-height), var(--media-size));
   margin-inline: auto;
   object-fit: contain;
 }
@@ -37,14 +33,18 @@
   margin-inline: auto;
 }
 
-/* attr()로 사진 비율을 읽을 수 있는 browser에서는 높이를 줄인 세로 사진도 상자가 사진 크기와 같아져
-   모서리와 캡션이 사진에 맞는다. 원본보다 크게 늘리지도 않는다. 나머지 browser는 위 규칙대로.
-   화면 높이에 맞춘 폭(--fit-width)이 본문 폭(100cqw, PostLayout의 .post-body)의 85% 이상이면 본문 폭을 꽉 채운다.
-   창 높이가 조금 낮을 때 사진이 본문보다 몇 px만 좁아지면 정렬 실수처럼 보이기 때문이다.
-   (clamp 식: --fit-width가 85cqw보다 작으면 0, 크면 본문 폭까지 남은 만큼 더한다) */
-@supports (width: calc(attr(width type(<number>), 0) * 1px)) {
+/* attr()로 사진 비율을 읽을 수 있는 browser에서는 사진마다 크기를 정한다.
+   - 비율과 상관없이 넓이가 비슷하게: 폭 = --media-size × √(가로/세로).
+     정사각형 360, 4:3 416, 16:9 480, 3:4 312px 폭. 가로로 긴 사진일수록 넓고, 정사각형·세로 사진은 좁다.
+   - 화면 높이(--media-max-height)를 넘지 않고, 원본보다 크게 늘리지 않는다.
+   - 그렇게 정한 폭(--fit-width)이 본문 폭(100cqw, PostLayout의 .post-body)의 85% 이상이면 본문 폭을 꽉 채운다.
+     사진이 본문보다 몇 px만 좁으면 정렬 실수처럼 보이기 때문이다.
+     (clamp 식: --fit-width가 85cqw보다 작으면 0, 크면 본문 폭까지 남은 만큼 더한다)
+   상자가 사진 크기와 같아서 모서리와 캡션도 사진에 맞는다. */
+@supports (width: calc(attr(width type(<number>), 0) * sqrt(4) * 1px)) {
   .prose :where(figure > img, figure > a > img, p > img:only-child, p > a:only-child > img:only-child):where([width][height]) {
-    --fit-width: calc(var(--media-max-height) * attr(width type(<number>)) / attr(height type(<number>)));
+    --ratio: calc(attr(width type(<number>)) / attr(height type(<number>)));
+    --fit-width: min(var(--media-max-height) * var(--ratio), var(--media-size) * sqrt(var(--ratio)));
     width: min(
       attr(width type(<number>)) * 1px,
       var(--fit-width) + clamp(0px, (var(--fit-width) - 85cqw) * 1000, max(0px, 100cqw - var(--fit-width)))
@@ -76,11 +76,13 @@
 }
 
 .prose :where(figure:not(.quote) > figcaption) {
-  margin-top: var(--space-3);
+  /* 사진에 바로 붙여, 어느 사진의 설명인지 한눈에 보이게 */
+  margin-top: var(--space-1);
   font-size: var(--text-sm);
   line-height: var(--leading-snug);
   color: var(--color-text-muted);
-  text-align: start;
+  /* 사진 오른쪽 아래. figure 폭이 사진 폭과 같아서(위 @supports) 사진 오른쪽 끝에 맞는다. */
+  text-align: end;
 }
 
 /* ==========================================================================
