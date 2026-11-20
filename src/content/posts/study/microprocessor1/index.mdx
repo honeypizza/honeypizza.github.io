@@ -45,3 +45,18 @@ SD 카드를 통해서 github에 있는 파일들을 몽땅 올리고 몇가지 
 - sample
 - embedding copy
 - decode + print
+
+profiling을 위해서 기존의 c 코드에 timer를 각 연산 구간별로 넣어서 합산했다. 결과는 다음과 같다.
+![alt text](image-1.png)
+
+일단 마지막 section 을 보면 1개의 토큰을 만들 때 약 15M 개의 MAC 연산을 한다는 것과 CPU는 1초에 27M 개의 MAC 연산을 할 수 있다는 결과가 있다.
+
+이를 통해서 보자면
+<Callout>연산기의 초당 MAC 처리수 (MAC/sec) / 토큰당 MAC 연산 갯수 (MAC/tok) = 27M / 15M = 1.8 tok/s </Callout>
+임을 알 수 있다. 1.7 tok/s 와 대강 맞는 수치
+
+그리고 가운데 section을 보면 matrix multiplication이 전체 연산 시간의 96.1%나 차지하는 것을 알 수 있다. 
+결국에는 matrix multiplication 만 최적화하더라도, 전체 시스템의 96.1%를 최적화하는 셈이다.
+
+
+범인은 검거했으니 다음에는 어떻게 빠르게 만들지 생각하고 글을 써보자
