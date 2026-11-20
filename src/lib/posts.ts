@@ -36,8 +36,14 @@ export function postHref(post: Post) {
 
 export { tagSlug };
 
-export function tagHref(tag: string) {
-  return `/tags/${tagSlug(tag)}/`;
+/**
+ * 태그 page 주소.
+ * - 분류를 주면 그 분류 글만 모은 태그 page: /posts/daily/tags/<태그>/
+ * - 없으면 전체 글의 태그 page: /tags/<태그>/
+ */
+export function tagHref(tag: string, category?: Category) {
+  const base = category ? `${CATEGORIES[category].href}tags/` : '/tags/';
+  return `${base}${tagSlug(tag)}/`;
 }
 
 /** 태그별로 글을 묶는다. 표기는 처음 나온(가장 최근 글의) 태그 이름을 따른다. */

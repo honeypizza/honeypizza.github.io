@@ -57,7 +57,7 @@ const showToc = tocHeadings.filter((heading) => heading.depth === 2).length >= 2
               <ul class="tags" aria-label="태그">
                 {tags.map((tag) => (
                   <li>
-                    <a href={tagHref(tag)}>#{tag}</a>
+                    <a href={tagHref(tag, category)}>#{tag}</a>
                   </li>
                 ))}
               </ul>

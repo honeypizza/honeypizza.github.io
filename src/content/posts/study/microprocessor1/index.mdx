@@ -59,4 +59,22 @@ profiling을 위해서 기존의 c 코드에 timer를 각 연산 구간별로 �
 결국에는 matrix multiplication 만 최적화하더라도, 전체 시스템의 96.1%를 최적화하는 셈이다.
 
 
-범인은 검거했으니 다음에는 어떻게 빠르게 만들지 생각하고 글을 써보자
+### matrix multiply & accumulation (MAC)
+따라서 지금 우리가 하는 matmul이 뭔지 한 번 봐봐야 한다.
+
+```c
+void matmul(float* xout, float* x, float* w, int n, int d) {
+    // W (d,n) @ x (n,) -> xout (d,)
+    // by far the most amount of time is spent inside this little function
+    int i;
+    prof_macs += (unsigned long long)n * d;   // [PROF] count multiply-accumulates
+    #pragma omp parallel for private(i)
+    for (i = 0; i < d; i++) {
+        float val = 0.0f;
+        for (int j = 0; j < n; j++) {
+            val += w[i * n + j] * x[j];
+        }
+        xout[i] = val;
+    }
+}
+```
