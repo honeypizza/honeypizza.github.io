@@ -1,0 +1,25 @@
+마이크로프로세서 수업에서 하는 term project인 LLM 을 zynq ultrascale 96의 ARM processor를 baseline으로 PL section을 이용해 가속하는 내용이에요.
+
+
+{/*
+  이 주석은 화면에 보이지 않습니다. 다 읽었으면 지워도 됩니다. 자세한 방법은 GUIDE.md를 참고하세요.
+  제목·요약·날짜·태그는 같은 폴더의 info.md에 적습니다. 이 파일에는 글만 씁니다.
+
+  코드:     ```js 와 ``` 사이에 코드를 씁니다.
+  강조 박스: <Callout>참고할 내용</Callout>
+            <Callout type="warning" title="주의">주의할 내용</Callout>
+  인용:     <Quote name="이름" role="소속 · 직함">인용문</Quote>
+  각주:     문장 끝에 [^1], 글 맨 아래에 [^1]: 각주 내용
+  사진:     ![사진 설명](./photo.jpg "캡션")
+*/}
+
+
+### Memory bound 와 compute_bound
+
+저번에는 컴퓨터구조에서 중요하게 여기는 amdahl의 법칙을 소개했었는데 이번에는 roofline을 좀 소개하면서 시작.
+현대 컴퓨터를 크게 두개의 부분으로 나눈다고 하면 
+- 외우는 부분
+- 계산하는 부분
+이렇게 나눌 수 있다.
+
+예를 들어. 
