@@ -51,3 +51,22 @@ cache에서 읽으면 DDR에서 읽는것보다 속도가 빠르기 때문에 we
 compute bound를 해소하기 위해서는 결국에는 compute를 빠르게 할 방법을 고안해야하는데, 이미 우리가 가지고 있는 hardware인 CPU에서는 이것이 최대이다.
 
 따라서 PL section에 MAC용 처리 unit을 따로 만들어서 CPU에 연결하고, CPU에서 MAC을 처리할 때는 이 unit에 forwarding해서 빠르게 처리할 수 있도록 하는 것이 해결 방법이다.
+
+일단 뭔가 간단한 것에서부터 시작해서 하나하나 붙여나가는 것이 예뻐보여서 제일 간단한 구조에서부터 제안했다. schematic은 다음과 같다.
+![alt text](image.png "naive approach accelerator")
+
+구성은 
+- zynq_ultra_ps_e (왼쪽 아래)
+- gemm_naive_0 (왼쪽 위)
+- rst_ps8 (가운데)
+- axi_smc (오른쪽)
+  
+이렇게 되어있는데, (클로드와)내가 만든 것은 gemm_naive 이다. (또한 C code에서도 gemm_naive 하드웨어에서 돌릴 수 있게 새로운 matrix multiplication 함수를 정의해줬다.)
+
+그래서 결과를 보면 다음과 같다.
+![alt text](image-1.png "result of naive approach")
+
+보면 CPU matmul에서는 3003us 밖에 안 들었는데, naive_hw에서는 20109us나 시간이 들고 naive_hw가 바뻤던 시간이 90% 이상을 차지한다. (띠용~!)
+추가한 hardware가 CPU보다 느려서 compute bound를 더 심화시켰고 성능도 저하됐다.
+
+이게 왜그러는지랑, 고치는 건 다음에~!
