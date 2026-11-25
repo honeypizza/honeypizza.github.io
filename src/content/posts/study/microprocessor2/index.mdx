@@ -1,4 +1,4 @@
-마이크로프로세서 수업에서 하는 term project인 LLM 을 zynq ultrascale 96의 ARM processor를 baseline으로 PL section을 이용해 가속하는 내용이에요.
+LLM 을 zynq ultrascale 96의 ARM processor를 baseline으로 PL section을 이용해 가속하는 내용이에요.
 
 
 {/*
@@ -14,12 +14,40 @@
 */}
 
 
-### Memory bound 와 compute_bound
+### Memory bound 와 Compute bound
+
 
 저번에는 컴퓨터구조에서 중요하게 여기는 amdahl의 법칙을 소개했었는데 이번에는 roofline을 좀 소개하면서 시작.
-현대 컴퓨터를 크게 두개의 부분으로 나눈다고 하면 
-- 외우는 부분
-- 계산하는 부분
-이렇게 나눌 수 있다.
 
-예를 들어. 
+우리가 2 + 3 같이 연산을 해본다고 하면, 해당 연산은 두개로 나뉜다.
+- 2,3 같은 숫자
+- 덧셈, 뺄셈 같은 연산자 
+
+현대 컴퓨터도 이에 맞춰 크게 두 부분으로 나눌 수 있다.
+- 숫자(데이터)를 저장하고 보급하는 부분 (메모리)
+- 연산자(+)를 바탕으로 실제 계산을 수행하는 부분 (연산장치)
+
+전체 작업 시간 중 데이터를 가져오는데 시간이 더 오래 걸리면 memory bound, 실제 계산을 수행하는데 시간이 더 오래 걸리면 compute bound 라고 한다.
+
+어떤 시스템이 느려졌을 때 compute bound인지, memory bound인지를 판단해서 그에 맞는 최적화를 해야한다. 
+memory bound인데 compute bound를 위한 최적화를 하면 성능 향상은 미비하다.
+비유하자면, 기침이 나오는 증상이 있는데 기침약을 줘야 증상이 호전되지 콧물약을 주면 안된다... 이런 식으로 생각하면 좋다.
+
+모쪼록 어떤 bound인지 알아보기 위해서 C code를 수정해서 weight를 DDR에서 불러올 때, cache에서 불러올 때, 등등을 추적했을 때의 결과는 다음과 같다.
+
+| Test | 15M (n = 288) | 42M (n = 512) |
+| :--- | :--- | :--- |
+| A: DDR read (MB/s, 3 runs) | 1,360 / 1,371 / 1,371 | 1,376 / 1,371 / 1,067 |
+| B1: W in cache (MMAC/s) | 27.8 | 27.8 |
+| B2: W in DDR (MMAC/s) | 27.6 | 27.6 |
+
+cache에서 읽으면 DDR에서 읽는것보다 속도가 빠르기 때문에 weight의 보급 속도가 빨라진다고 생각하면 된다. 
+하지만 여기서 보듯이 weight의 보급 속도가 빠르다고 해서, MAC을 하는 횟수가 늘어나지 않는 것을 확인할 수 있다.
+
+그러니 지금 우리의 system은 data를 보급하는 것이 문제가 아니라, compute가 느린 것이 문제인, compute bound 상태라고 생각할 수 있다.
+
+### Compute bound의 해소
+
+compute bound를 해소하기 위해서는 결국에는 compute를 빠르게 할 방법을 고안해야하는데, 이미 우리가 가지고 있는 hardware인 CPU에서는 이것이 최대이다.
+
+따라서 PL section에 MAC용 처리 unit을 따로 만들어서 CPU에 연결하고, CPU에서 MAC을 처리할 때는 이 unit에 forwarding해서 빠르게 처리할 수 있도록 하는 것이 해결 방법이다.
