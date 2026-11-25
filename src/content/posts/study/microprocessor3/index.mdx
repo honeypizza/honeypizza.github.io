@@ -1,0 +1,22 @@
+### 왜구릴까?
+이전 페이지에서 matrix multiplication 용 hardware를 새로 설계했지만, 오히려 성능이 더 저하되는 것을 보았다.
+일단 왜 성능이 저하되었는지를 먼저 설명해보자면 그냥 matrix multiplication용 하드웨어를 구리게 만들어서 그렇다.
+
+### matrix multiplication hardware 구성
+현재 matmul unit은 단순하게 xilinx에서 지원하는 floating point(fp) 전용 하드웨어인 fp_mul 과 fp_add를 직렬연결한 것이다.
+
+
+fp_mul은 8cycle이 걸리고, fp_add는 11cycle이 걸린다. 그 사이를 연결하고, data가 오가는 것을 control 하는데도 3cycle정도 걸린다.
+
+그래서 한 번 matmul을 하는데 8 + 11 + 3 = 22 cycle이 걸리는 것이다.
+
+지금 PL section은 100MHz인데 1개의 matmul을 하는데 22cycle이 걸리니까. 
+<Callout> 100M / 22 = 4.55M MAC/s </Callout>
+4.55M MAC/s의 성능을 얻을 수 있다.
+CPU도 약 27M MAC/s가 가능했는데... 한 6배정도 구리다는 것이 여실히 보인다. (아오!)
+
+
+### Overlap & Pipelining
+지금 우리의 문제는 연산할 데이터를 한 번 넣으면, 그 결과가 나올 때까지 22 cycle 동안 다음 데이터를 넣지 못하고 기다려야 한다는 것이다.
+
+데이터를 더 빠르게 넣기 위해서 컴퓨터구조에서 자주 사용하는 기법은 overlap과 pipelining이다. 

@@ -1,4 +1,4 @@
-LLM 을 zynq ultrascale 96의 ARM processor를 baseline으로 PL section을 이용해 가속하는 내용이에요.
+LLM 을 zynq ultrascale 96의 ARM processor를 baseline으로 PL section을 이용해 가속하기
 
 
 {/*
@@ -69,4 +69,4 @@ compute bound를 해소하기 위해서는 결국에는 compute를 빠르게 할
 보면 CPU matmul에서는 3003us 밖에 안 들었는데, naive_hw에서는 20109us나 시간이 들고 naive_hw가 바뻤던 시간이 90% 이상을 차지한다. (띠용~!)
 추가한 hardware가 CPU보다 느려서 compute bound를 더 심화시켰고 성능도 저하됐다.
 
-이게 왜그러는지랑, 고치는 건 다음에~!
+이게 왜 그러는지랑, 고치는 건 다음에~!
